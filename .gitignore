@@ -1,0 +1,15 @@
+# Python bytecode files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment folders
+venv/
+env/
+
+# VS Code workspace settings
+.vscode/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
