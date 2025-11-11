@@ -192,6 +192,7 @@ def main():
                 print("Error: User not found or data corrupted.\n")
                 continue
 
+            # Ask user for password and verify it
             password = input("Enter password:\t").strip()
             is_valid, error_msg = verify_password(password, stored_hash)
             if not is_valid:
