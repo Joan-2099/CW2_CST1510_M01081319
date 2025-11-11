@@ -104,6 +104,8 @@ def verify_password(password, stored_hash):
     else:
         return False, "Password must contain:\nAtleast one upper case letter\nAtleast one number\nAtleast one lowercase letter\nAtleast one special character(@$*#%^_!*&)"
 
+# function created to login user
+
 
 def login(user_name, password):
     with open(USER_DATA_FILE, "r") as file:

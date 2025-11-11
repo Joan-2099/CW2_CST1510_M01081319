@@ -6,7 +6,7 @@ Course: CST1510 -Programming and Communication
 
 ## Project Description
 A command-line authentication system implementing secure password hashing
-This system allows users to register accounts and log in with proper pass
+This system allows users to register accounts and log in with proper pass.
 
 ## Features
 - Secure password hashing using bcrypt with automatic salt generation
