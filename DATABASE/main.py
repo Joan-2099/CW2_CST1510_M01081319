@@ -40,14 +40,7 @@ def validate_password(password):
 
     return True, ""
 
-# function created to get username
 
-
-def verify_user_name(user_name):
-    from app.data.users import get_user_by_username
-    if get_user_by_username(user_name):
-        return True, ""
-    return False, "Username not found"
 
 # function created to retrieve password
 
@@ -156,17 +149,6 @@ def main():
 
         else:
             print("\nError: Invalid option. Please select 1, 2, or 3.")
-
-    # 4. Test CRUD
-    incident_id = insert_incident(
-        "2024-11-05",
-        "Phishing",
-        "High",
-        "Open",
-        "Suspicious email detected",
-        "alice"
-    )
-    print(f"Created incident #{incident_id}")
 
     # 5. Query data
     df = get_all_incidents()

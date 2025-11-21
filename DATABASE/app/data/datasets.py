@@ -1,4 +1,4 @@
-from app.data.db import connect_database
+from .db import connect_database
 
 
 def get_dataset_by_id(dataset_id):

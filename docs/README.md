@@ -26,7 +26,9 @@ This system allows users to register accounts and log in with proper pass.
 # Week 8: SQLite Database Integration & Incident Management System
 
 ## Project description
-This week extends the secure authentication system from Week 7 by migrating from file-based storage to a structured SQLite relational database. The project now supports persistent, query-friendly data storage, user authentication backed by hashed passwords, and the ability to log and manage cyber incidents through a menu-driven command-line interface.
+This week extends the secure authentication system from Week 7 by migrating from file-based storage to a structured SQLite relational database. 
+
+The project now supports persistent, query-friendly data storage, user authentication backed by hashed passwords, and the ability to log and manage cyber incidents through a menu-driven command-line interface.
 
 # Features
 
@@ -96,7 +98,7 @@ During login:
 - Username is checked for existence within database
 - Stored hashed password is retrieved.
 - Input password is verified (refer to week 7)
-- Successful login grants access to interact with incidents.
+- Successful login grants access for users to interact with incidents.
 
 ## Cyber Incidents Data Flow
 - Users can add incidents via the CLI.
@@ -110,3 +112,55 @@ Register a new user
 Login
 Exit
 Prompts guide the user through registration, login, and error handling.
+
+# Week 9 – Web Interface, MVC & Visualisation
+
+## Project Description
+This week, I took the cyber incident system I built before and moved it into a simple web dashboard using Streamlit.
+
+Instead of using the terminal, I now have a small web page where I can view all cyber incidents stored in my SQLite database and add new ones using a form. It’s still simple, but it feels more like a real application now.
+
+## What the Web Dashboard Can Do
+- Shows all recorded cyber incidents in a table
+- Lets the user fill out a form with:
+- Name of the person reporting
+- Incident title
+- Severity (Low, Medium, High, Critical)
+- Status (Open, In Progress, Resolved)
+- Description
+- Saves the new incident into the database when the form is submitted
+- Updates automatically so the new incident appears right away
+
+## How the System Works
+This project uses the MVC idea (Model–View–Controller), even in a basic way:
+
+### Model (M) – Data and Database
+
+- I used an SQLite database called intelligence_platform.db
+- It stores all cyber incidents in a table called cyber_incidents
+- Each incident has:
+    id
+    date
+    incident type (title)
+    severity
+    status
+    description
+    reported_by
+    timestamp when it was created
+
+- My Python files inside /DATABASE/app/data/ handle everything related to the database (reading, writing, connecting, etc.)
+
+## View (V) – The Web Page
+This is the Streamlit page (master.py)
+It displays:
+    - A title
+    - A table with all the incidents
+    - A form to add a new incident
+Streamlit automatically refreshes the page when new data is saved
+
+## Controller (C) – The Logic
+When the user presses “Add Incident,” the program:
+- Collects the data from the form
+- Gets the current date
+- Sends everything to insert_incident()
+- Shows a success message
