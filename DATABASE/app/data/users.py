@@ -10,8 +10,6 @@ def get_user_by_username(username):
     return user
 
 # function created to get username
-
-
 def verify_user_name(user_name):
     from app.data.users import get_user_by_username
     if get_user_by_username(user_name):

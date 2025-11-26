@@ -1,6 +1,11 @@
 import pandas as pd
+import csv
+from pathlib import Path
 from .db import connect_database
 
+#import csv path
+CSV_FILE = Path(__file__).resolve().parents[3] / "DATA"/ "cyber_incidents.csv"
+print("Writing it at", CSV_FILE)
 
 def insert_incident(date, incident_type, severity, status, description, reported_by):
     """Insert new incident."""
@@ -14,6 +19,26 @@ def insert_incident(date, incident_type, severity, status, description, reported
     conn.commit()
     incident_id = cursor.lastrowid
     conn.close()
+
+    # If the file doesn't exist or it's empty, write the header once
+    write_header = not CSV_FILE.exists() or CSV_FILE.stat().st_size == 0
+
+    with open(CSV_FILE, mode="a", newline='', encoding="utf-8") as file:
+        writer = csv.writer(file)
+
+        # Add header only once
+        if write_header:
+            writer.writerow([
+                "incident_id", "date", "incident_type", 
+                "severity", "status", "description", "reported_by"
+            ])
+
+        # Add the incident row
+        writer.writerow([
+            incident_id, date, incident_type,
+            severity, status, description, reported_by
+        ])
+
     return incident_id
 
 

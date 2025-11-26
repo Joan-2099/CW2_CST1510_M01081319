@@ -40,6 +40,7 @@ def validate_username(user_name):
 
 
 def validate_password(password):
+    
     # check for password length
     if len(password) < 8:
         return False, "Password must be atleast 8 characters long"

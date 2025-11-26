@@ -5,6 +5,7 @@ import bcrypt
 # goes up two levels to CST1520_CS2
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = PROJECT_ROOT / "DATA"
+DB_PATH = DATA_DIR / "intelligence_platform.db"
 
 
 def create_users_table(conn):

@@ -1,0 +1,4 @@
+incident_id,date,incident_type,severity,status,description,reported_by
+7,2025-11-25,Masquerading,Low,In Progress,False advertisement,Mavin
+8,2025-11-25,Phishing,Critical,Resolved,Suspicious email detected,Hilary
+13,2025-11-26,Malware Attacks,Medium,Open,Trojan virus,Havana

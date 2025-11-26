@@ -164,3 +164,51 @@ When the user presses “Add Incident,” the program:
 - Gets the current date
 - Sends everything to insert_incident()
 - Shows a success message
+
+
+
+# Datasets Page - Multi-Domain 
+
+## Intelligence Platform
+### Overview
+The Datasets page provides a data ingestion and visualization interface for CSV files in the Multi-Domain Intelligence Platform. It leverages Streamlit for the web interface, pandas for data handling, and Plotly for dynamic charting.
+The page enables:
+Uploading CSV datasets
+Previewing data in tabular format
+Generating interactive charts (Bar and Pie)
+This module is designed for rapid data exploration and can integrate into a larger MVC Streamlit architecture.
+### Technical Architecture
+Frontend: Streamlit widgets for file upload, table preview, and chart selection.
+Backend:
+pandas: Handles CSV parsing, column type inference, and DataFrame operations.
+Plotly Express / Graph Objects: Provides dynamic, interactive visualizations.
+Workflow:
+User uploads a CSV file via st.file_uploader.
+CSV is read into a pandas DataFrame (pd.read_csv).
+Basic statistics (row count, column count, preview) are displayed.
+User selects a chart type (Bar or Pie) and X/Y axes from available columns.
+Chart is dynamically rendered using Plotly and displayed in the Streamlit page.
+### File Upload & Parsing
+uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
+if uploaded_file is not None:
+    df = pd.read_csv(uploaded_file)
+Validation: Only .csv files are accepted.
+Error handling: Exceptions are captured and displayed using st.error.
+DataFrame: Column types are automatically inferred by pandas.
+### Data Exploration
+st.dataframe(df): Displays a scrollable, interactive table.
+df.head(): Shows top N rows for preview.
+Column metadata:
+num_columns = len(df.columns)
+all_columns = df.columns.tolist()
+numeric_cols = df.select_dtypes(include='number').columns.tolist()
+### Charting
+Dynamic charting with Plotly:
+Bar Chart: Visualizes numeric Y-axis values against categorical X-axis.
+Pie Chart: Aggregates numeric Y-axis values for slices based on categorical X-axis.
+Chart selection workflow:
+chart_type = st.radio("Choose a chart type:", ["Bar Chart","Pie Chart"])
+x_axis = st.selectbox("Select X-axis (category):", all_columns)
+y_axis = st.selectbox("Select Y_axis (category):", numeric_cols)
+Charts update reactively when X/Y axes or chart type are changed.
+Uses px.bar() and px.pie() for visualization.
