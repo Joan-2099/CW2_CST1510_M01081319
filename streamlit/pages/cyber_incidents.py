@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 
-# Absolute path to your project root
+# Absolute path to project root
 project_root = Path("/Users/joanmartha/Desktop/CST1510_CS2")
 sys.path.append(str(project_root))
 
@@ -40,4 +40,4 @@ if st.button("Log out"):
     st.session_state.logged_in=False
     st.session_state.user_name=""
     st.info("You have been logged out")
-    st.switch_page("Home.py")
+    st.switch_page("")

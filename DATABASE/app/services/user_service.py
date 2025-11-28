@@ -52,13 +52,13 @@ def migrate_users_from_file(filepath=DATA_DIR / "users.txt"):
     print(f"✅ Migrated {migrated_count} users from {filepath.name}")
 
 
-def register_user(username, password, role='user'):
+def register_user(username, password, role):
     """Register new user with password hashing."""
     # Hash password
     password_hash = bcrypt.hashpw(password.encode('utf-8'),
         bcrypt.gensalt()
     ).decode('utf-8')
-
+    
     # Insert into database
     insert_user(username, password_hash, role)
     return True, f"User '{username}' registered successfully."
@@ -66,15 +66,26 @@ def register_user(username, password, role='user'):
 
 def login_user(username, password):
     """Authenticate user."""
+    #check if username doesnt exist
     user = get_user_by_username(username)
     if not user:
         return False, "User not found."
 
+    #check if fields are empty
+    elif username ==" ":
+        return False, "Please enter username", None
+    
+    elif password == " ":
+        return False, "Please enter password", None
     # Verify password
     stored_hash = user[2]  # password_hash column
+    role = user[3]#this gets role from Database
+    
     if bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8')):
-        return True, f"Login successful!"
-    return False, "Incorrect password."
+        return True, f"Login successful!",role
+
+    else:
+        return False, "Incorrect password.", None
 
 
 def validate_username(user_name):

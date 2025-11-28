@@ -1,0 +1,97 @@
+incident_id,date,incident_type,severity,status,description,reported_by
+7,2025-11-25,Masquerading,Low,In Progress,False advertisement,Mavin
+8,2025-11-25,Phishing,Critical,Resolved,Suspicious email detected,Hilary
+13,2025-11-26,Malware Attacks,Medium,Open,Trojan virus,Havana
+101,2025-11-01,Phishing,High,Open,Suspicious login attempt,John
+102,2025-11-01,Malware Attacks,Medium,In Progress,Ransomware detected,Sarah
+103,2025-11-02,Data Breach,Critical,Resolved,Customer database exposed,Hannah
+104,2025-11-02,Denial of Service,Low,Open,DDoS attack on web server,Alex
+105,2025-11-03,Insider Threat,High,In Progress,Unauthorized data access,Mike
+106,2025-11-03,Ransomware,Critical,Open,Encrypted files detected,Olivia
+107,2025-11-04,Credential Theft,Medium,In Progress,Compromised password,Hilary
+108,2025-11-04,Phishing,Low,Resolved,Suspicious email link,Mavin
+109,2025-11-05,Malware Attacks,High,Open,Trojan horse detected,Liam
+110,2025-11-05,Data Breach,Critical,In Progress,Exposed customer info,Sarah
+111,2025-11-06,Denial of Service,Medium,Resolved,DDoS mitigated,Hannah
+112,2025-11-06,Insider Threat,High,Open,Unauthorized access attempt,John
+113,2025-11-07,Ransomware,Critical,In Progress,Files encrypted by malware,Alex
+114,2025-11-07,Masquerading,Medium,Resolved,Fake email impersonation,Olivia
+115,2025-11-08,Phishing,Low,Open,Phishing website reported,Hilary
+116,2025-11-08,Malware Attacks,High,In Progress,Malware attachment detected,Mavin
+117,2025-11-09,Data Breach,Critical,Resolved,Database exposed,Liam
+118,2025-11-09,Denial of Service,Medium,Open,Server outage detected,John
+119,2025-11-10,Insider Threat,High,In Progress,Internal policy breach,Sarah
+120,2025-11-10,Ransomware,Critical,Open,Encrypted network drives,Hannah
+121,2025-11-11,Credential Theft,Medium,Resolved,Compromised credentials,Alex
+122,2025-11-11,Phishing,Low,Open,Suspicious email link,Olivia
+123,2025-11-12,Malware Attacks,High,In Progress,Trojan detected,Mike
+124,2025-11-12,Data Breach,Critical,Resolved,Exposed PII data,Hilary
+125,2025-11-13,Denial of Service,Medium,Open,DDoS attack,Liam
+126,2025-11-13,Insider Threat,High,In Progress,Unauthorized data access,John
+127,2025-11-14,Ransomware,Critical,Open,Encrypted files detected,Sarah
+128,2025-11-14,Masquerading,Medium,Resolved,Fake credentials used,Hannah
+129,2025-11-15,Phishing,Low,Open,Phishing link clicked,Alex
+130,2025-11-15,Malware Attacks,High,In Progress,Ransomware dropped,Olivia
+131,2025-11-16,Data Breach,Critical,Resolved,Database leak detected,Mike
+132,2025-11-16,Denial of Service,Medium,Open,Service outage,Liam
+133,2025-11-17,Insider Threat,High,In Progress,Unauthorized modification,John
+134,2025-11-17,Ransomware,Critical,Open,Encrypted critical files,Hilary
+135,2025-11-18,Credential Theft,Medium,Resolved,Stolen login credentials,Mavin
+136,2025-11-18,Phishing,Low,Open,Suspicious email received,Havana
+137,2025-11-19,Malware Attacks,High,In Progress,Trojan in attachment,Alex
+138,2025-11-19,Data Breach,Critical,Resolved,Customer info leaked,Olivia
+139,2025-11-20,Denial of Service,Medium,Open,DDoS on public portal,Mike
+140,2025-11-20,Insider Threat,High,In Progress,Internal data misuse,Liam
+141,2025-11-21,Ransomware,Critical,Open,Files encrypted,Hannah
+142,2025-11-21,Masquerading,Medium,Resolved,Fake social profile,Sarah
+143,2025-11-22,Phishing,Low,Open,Malicious email,John
+144,2025-11-22,Malware Attacks,High,In Progress,Malware on endpoint,Mavin
+145,2025-11-23,Data Breach,Critical,Resolved,Exposed personal info,Olivia
+146,2025-11-23,Denial of Service,Medium,Open,Web server down,Alex
+147,2025-11-24,Insider Threat,High,In Progress,Internal policy violation,Mike
+148,2025-11-24,Ransomware,Critical,Open,Encrypted network drives,Liam
+149,2025-11-25,Credential Theft,Medium,Resolved,Account compromise,Hilary
+150,2025-11-25,Phishing,Low,Open,Phishing email detected,Hannah
+151,2025-11-26,Malware Attacks,High,In Progress,Trojan virus,Mavin
+152,2025-11-26,Data Breach,Critical,Resolved,Database exposed,Olivia
+153,2025-11-27,Denial of Service,Medium,Open,Service interruption,John
+154,2025-11-27,Insider Threat,High,In Progress,Unauthorized data access,Alex
+155,2025-11-28,Ransomware,Critical,Open,Files encrypted,Hannah
+156,2025-11-28,Masquerading,Medium,Resolved,Fake user impersonation,Mike
+157,2025-11-29,Phishing,Low,Open,Suspicious email received,Liam
+158,2025-11-29,Malware Attacks,High,In Progress,Ransomware detected,Hilary
+159,2025-11-30,Data Breach,Critical,Resolved,Customer info leak,John
+160,2025-11-30,Denial of Service,Medium,Open,DDoS attack,Mavin
+161,2025-12-01,Insider Threat,High,In Progress,Internal data misuse,Olivia
+162,2025-12-01,Ransomware,Critical,Open,Encrypted files,Hannah
+163,2025-12-02,Credential Theft,Medium,Resolved,Account compromise,Alex
+164,2025-12-02,Phishing,Low,Open,Malicious email,Mike
+165,2025-12-03,Malware Attacks,High,In Progress,Trojan detected,Liam
+166,2025-12-03,Data Breach,Critical,Resolved,Exposed PII,Hilary
+167,2025-12-04,Denial of Service,Medium,Open,Server outage,Sarah
+168,2025-12-04,Insider Threat,High,In Progress,Unauthorized access,John
+169,2025-12-05,Ransomware,Critical,Open,Encrypted files,Mavin
+170,2025-12-05,Masquerading,Medium,Resolved,Fake credentials used,Olivia
+171,2025-12-06,Phishing,Low,Open,Suspicious email detected,Hannah
+172,2025-12-06,Malware Attacks,High,In Progress,Ransomware dropped,Alex
+173,2025-12-07,Data Breach,Critical,Resolved,Database leak,Mike
+174,2025-12-07,Denial of Service,Medium,Open,DDoS attack,Liam
+175,2025-12-08,Insider Threat,High,In Progress,Internal policy breach,John
+176,2025-12-08,Ransomware,Critical,Open,Files encrypted,Hilary
+177,2025-12-09,Credential Theft,Medium,Resolved,Stolen credentials,Mavin
+178,2025-12-09,Phishing,Low,Open,Phishing website detected,Olivia
+179,2025-12-10,Malware Attacks,High,In Progress,Trojan virus,Hannah
+180,2025-12-10,Data Breach,Critical,Resolved,Customer info exposed,Alex
+181,2025-12-11,Denial of Service,Medium,Open,Web server down,Mike
+182,2025-12-11,Insider Threat,High,In Progress,Unauthorized access,Liam
+183,2025-12-12,Ransomware,Critical,Open,Encrypted drives,Hilary
+184,2025-12-12,Masquerading,Medium,Resolved,False advertisement,John
+185,2025-12-13,Phishing,Low,Open,Suspicious email,Mavin
+186,2025-12-13,Malware Attacks,High,In Progress,Ransomware detected,Olivia
+187,2025-12-14,Data Breach,Critical,Resolved,Database exposed,Hannah
+188,2025-12-14,Denial of Service,Medium,Open,DDoS attack,Alex
+189,2025-12-15,Insider Threat,High,In Progress,Internal data misuse,Mike
+190,2025-12-15,Ransomware,Critical,Open,Files encrypted,Liam
+191,2025-12-16,Credential Theft,Medium,Resolved,Account compromise,Hilary
+192,2025-12-16,Phishing,Low,Open,Suspicious email link,John
+193,2025-12-17,Malw

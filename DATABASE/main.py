@@ -43,7 +43,12 @@ def validate_password(password):
 
 
 # function created to retrieve password
-
+# function created to get username
+def verify_user_name(user_name):
+    from app.data.users import get_user_by_username
+    if get_user_by_username(user_name):
+        return True, ""
+    return False, "Username not found"
 
 def get_stored_hash(user_name):
     from app.data.users import get_user_by_username
