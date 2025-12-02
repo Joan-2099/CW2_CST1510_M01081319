@@ -22,9 +22,6 @@ st.set_page_config(
     layout="centered"
 )
 
-# Initialize session state for active tab
-if "active_tab" not in st.session_state:
-    st.session_state.active_tab = "login"
 
 #with tab_login:
 st.subheader("Login 🔑")
@@ -52,18 +49,11 @@ with st.form("Login"):
             if not is_valid:
                 st.error(f"Error: {error_msg}")
             else:
-                st.success("Incident added successfully!")
+                st.success(f"{username} logged insuccessfully!")
                 st.session_state["username"]=username
                 st.session_state["role"]=  role
-                st.success(f"Welcome, {username}!")
+                st.switch_page("pages/main_dash.py")
                 
-                #redirect user based on role
-                if role == "staff":
-                    st.switch_page("pages/IT_staff.py")
-
-                else:
-                  st.switch_page("pages/IT_users.py")
-        
     with col2:
         new_acc=st.form_submit_button("Create new acount")
         st.markdown("If you don't have account")

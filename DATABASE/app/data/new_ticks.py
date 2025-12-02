@@ -39,9 +39,7 @@ def sync_csv_from_db():
     save_tickets_to_csv(tickets, headers)
 
 
-# -----------------------
 # CRUD Functions
-# -----------------------
 def insert_ticket(title, description, status="open", assigned_to="unassigned"):
     conn = connect_database()
     cursor = conn.cursor()

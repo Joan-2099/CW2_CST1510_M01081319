@@ -7,15 +7,44 @@ sys.path.append(str(project_root))
 
 import streamlit as st
 from DATABASE.app.data.db import connect_database
-from DATABASE.app.data.incidents import get_all_incidents, insert_incident
+from DATABASE.app.data.incidents import get_all_incidents, insert_incident, analyze_incident
+from DATABASE.app.utils.auth import require_login, logout
+
 
 # connencting to database
 conn = connect_database("DATA/intelligence_platform.db")
 
 st.title("Cyber Incidents Dashboard")
+if "username" not in st.session_state:
+    st.session_state["username"] = None
+if "role" not in st.session_state:
+    st.session_state["role"] = None
 
+require_login(role="user")
+  
 incidents = get_all_incidents()
 st.dataframe(incidents, use_container_width=True)
+
+# Build options: "ID — Incident Type (Severity)"
+options = [
+    f"{row['id']} — {row['incident_type']} ({row['severity']})"
+    for _, row in incidents.iterrows()
+]
+
+# Selectbox with searchable input
+selected = st.selectbox(
+    "Select or search for an incident to analyze", 
+    options, 
+    help="Type to search or scroll through incidents"
+)
+
+if selected:
+    incident_id = int(selected.split(" — ")[0])
+    incident = incidents[incidents['id'] == incident_id].iloc[0]
+
+    if st.button("AI Analyze Incident", key=f"analyze_{incident_id}"):
+        analysis = analyze_incident(incident['description'], incident['severity'])
+        st.info(analysis)
 
 from datetime import date
 
@@ -37,7 +66,7 @@ with st.form("New Incident"):
 st.divider()
 
 if st.button("Log out"):
-    st.session_state.logged_in=False
-    st.session_state.user_name=""
-    st.info("You have been logged out")
-    st.switch_page("")
+    st.session_state.clear()
+    logout()
+
+    

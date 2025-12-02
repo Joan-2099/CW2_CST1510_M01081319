@@ -1,11 +1,3 @@
-1764230109,Computer not starting,I spilled some water yesterday and since then my computer has not come on,Open,Unassigned
-1764230257,Laptop is shocking me,"For the last couple days the computer has been getting hot and shocking name, I also notice some sparks when I  plug it in",Open,Unassigned
-1764230748,Apps keep deleting themselves,"My apps keep on disappearing on their own, I can't even find them in the recycle bin",Open,Unassigned
-1764230847,Screen frozen,My screen has been frozen for the last 3 days,Open,Unassigned
-1764230926,Heating phone,My phone is very hot,Open,Unassigned
-1764231082,Stolen laptop,My laptop went missing at the apple store,Open,Unassigned
-1764231324,Viruses,Many viruses popped up on my device,Open,Unassigned
-1764231374,Viruses,Many viruses popped up,Open,Unassigned
-1764231483,Malware,Multiple malware attacks,Open,Unassigned
-1764231615,Heating phone,My phone is very hot,Open,Unassigned
-1764265504,Random shutdown of computer,My laptop keeps shutting down,Open,Unassigned
+id,title,description,status,assigned_to,date_created,resolved_date,created_at
+1,Heating phone,My phone is very hot,Open,,,,2025-11-27 08:20:15
+2,Random shutdown of computer,My laptop keeps shutting down,Open,Unassigned,,,2025-11-27 17:45:04

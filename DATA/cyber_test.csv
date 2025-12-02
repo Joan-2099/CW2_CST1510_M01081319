@@ -94,4 +94,4 @@ incident_id,date,incident_type,severity,status,description,reported_by
 190,2025-12-15,Ransomware,Critical,Open,Files encrypted,Liam
 191,2025-12-16,Credential Theft,Medium,Resolved,Account compromise,Hilary
 192,2025-12-16,Phishing,Low,Open,Suspicious email link,John
-193,2025-12-17,Malw
+

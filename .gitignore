@@ -7,6 +7,14 @@ __pycache__/
 venv/
 env/
 
+.streamlit/secrets.toml
+sample_Data.csv
+append.py
+api.py
+python-version
+
+.env
+
 # VS Code workspace settings
 .vscode/
 

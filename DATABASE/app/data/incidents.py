@@ -1,7 +1,18 @@
 import pandas as pd
 import csv
+import sys
+import streamlit as st
 from pathlib import Path
-from .db import connect_database
+from google import genai
+from DATABASE.app.data.db import connect_database
+#When importing to streamlit its important not to use relative imports
+
+project_root = Path("/Users/joanmartha/Desktop/CST1510_CS2") 
+sys.path.append(str(project_root)) 
+
+api_key = st.secrets["GEMINAI_API_KEY"]
+client = genai.Client(api_key=api_key)
+
 
 #import csv path
 CSV_FILE = Path(__file__).resolve().parents[3] / "DATA"/ "cyber_incidents.csv"
@@ -102,3 +113,16 @@ def update_incident(incident_id, date=None, incident_type=None, severity=None, s
 
     conn.close()
     return cursor.rowcount  # returns number of rows updated
+
+def analyze_incident(description, severity):
+
+    response = client.models.generate_content(
+        model="gemini-2.0-flash-thinking-exp",
+        contents=f"""You are a cybersecurity expert.
+        Analyze this cyber incident and give insights.
+
+        Severity: {severity}
+        Description: {description}
+        """
+    )
+    return response.text
