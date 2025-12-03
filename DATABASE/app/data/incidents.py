@@ -5,124 +5,141 @@ import streamlit as st
 from pathlib import Path
 from google import genai
 from DATABASE.app.data.db import connect_database
-#When importing to streamlit its important not to use relative imports
 
-project_root = Path("/Users/joanmartha/Desktop/CST1510_CS2") 
-sys.path.append(str(project_root)) 
+project_root = Path("/Users/joanmartha/Desktop/CST1510_CS2")
+sys.path.append(str(project_root))
 
 api_key = st.secrets["GEMINAI_API_KEY"]
 client = genai.Client(api_key=api_key)
 
+CSV_FILE = Path(__file__).resolve().parents[3] / "DATA" / "cyber_incidents.csv"
 
-#import csv path
-CSV_FILE = Path(__file__).resolve().parents[3] / "DATA"/ "cyber_incidents.csv"
-print("Writing it at", CSV_FILE)
 
-def insert_incident(date, incident_type, severity, status, description, reported_by):
-    """Insert new incident."""
-    conn = connect_database()
-    cursor = conn.cursor()
-    cursor.execute("""
-        INSERT INTO cyber_incidents 
-        (date, incident_type, severity, status, description, reported_by)
-        VALUES (?, ?, ?, ?, ?, ?)
-    """, (date, incident_type, severity, status, description, reported_by))
-    conn.commit()
-    incident_id = cursor.lastrowid
-    conn.close()
+class Incidents:
+    def __init__(self):
+        self.csv_path = CSV_FILE
 
-    # If the file doesn't exist or it's empty, write the header once
-    write_header = not CSV_FILE.exists() or CSV_FILE.stat().st_size == 0
+    # Create Incident
+    def insert_incident(self, date, incident_type, severity, status, description, reported_by):
+        conn = connect_database()
+        cursor = conn.cursor()
 
-    with open(CSV_FILE, mode="a", newline='', encoding="utf-8") as file:
-        writer = csv.writer(file)
+        cursor.execute("""
+            INSERT INTO cyber_incidents 
+            (date, incident_type, severity, status, description, reported_by)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (date, incident_type, severity, status, description, reported_by))
 
-        # Add header only once
-        if write_header:
+        conn.commit()
+        incident_id = cursor.lastrowid
+        conn.close()
+
+        # Write to CSV
+        write_header = not self.csv_path.exists() or self.csv_path.stat().st_size == 0
+
+        with open(self.csv_path, "a", newline='', encoding="utf-8") as f:
+            writer = csv.writer(f)
+
+            if write_header:
+                writer.writerow([
+                    "incident_id", "date", "incident_type",
+                    "severity", "status", "description", "reported_by"
+                ])
+
             writer.writerow([
-                "incident_id", "date", "incident_type", 
-                "severity", "status", "description", "reported_by"
+                incident_id, date, incident_type,
+                severity, status, description, reported_by
             ])
 
-        # Add the incident row
-        writer.writerow([
-            incident_id, date, incident_type,
-            severity, status, description, reported_by
-        ])
+        return incident_id
 
-    return incident_id
+    # Read all incidents
+    def get_all_incidents(self):
+        conn = connect_database()
+        df = pd.read_sql_query("SELECT * FROM cyber_incidents ORDER BY id DESC", conn)
+        conn.close()
+        return df
 
+    # Delete Incident
+    @staticmethod
+    def delete_incident(self, incident_id):
+        conn = connect_database()
+        cursor = conn.cursor()
 
-def get_all_incidents():
-    """Get all incidents as DataFrame."""
-    conn = connect_database()
-    df = pd.read_sql_query(
-        "SELECT * FROM cyber_incidents ORDER BY id DESC",
-        conn
-    )
-    conn.close()
-    return df
-
-
-def delete_incident(incident_id):
-    """Delete an incident by its ID."""
-    conn = connect_database()
-    cursor = conn.cursor()
-    cursor.execute("""
-        DELETE FROM cyber_incidents WHERE id = ?
-    """, (incident_id,))
-    conn.commit()
-    conn.close()
-    return cursor.rowcount  # returns number of rows deleted
-
-
-def update_incident(incident_id, date=None, incident_type=None, severity=None, status=None, description=None, reported_by=None):
-    """Update an incident by its ID. Only provided fields will be updated."""
-    conn = connect_database()
-    cursor = conn.cursor()
-
-    # Build dynamic SQL based on which fields are provided
-    fields = []
-    values = []
-
-    if date is not None:
-        fields.append("date = ?")
-        values.append(date)
-    if incident_type is not None:
-        fields.append("incident_type = ?")
-        values.append(incident_type)
-    if severity is not None:
-        fields.append("severity = ?")
-        values.append(severity)
-    if status is not None:
-        fields.append("status = ?")
-        values.append(status)
-    if description is not None:
-        fields.append("description = ?")
-        values.append(description)
-    if reported_by is not None:
-        fields.append("reported_by = ?")
-        values.append(reported_by)
-
-    # Only proceed if there’s something to update
-    if fields:
-        sql = f"UPDATE cyber_incidents SET {', '.join(fields)} WHERE id = ?"
-        values.append(incident_id)
-        cursor.execute(sql, values)
+        cursor.execute("DELETE FROM cyber_incidents WHERE id = ?", (incident_id,))
         conn.commit()
+        rows = cursor.rowcount
+        conn.close()
 
-    conn.close()
-    return cursor.rowcount  # returns number of rows updated
+        return rows
 
-def analyze_incident(description, severity):
+    # Update Incident
+    def update_incident(self, incident_id, date=None, incident_type=None,
+                        severity=None, status=None, description=None, reported_by=None):
 
-    response = client.models.generate_content(
-        model="gemini-2.0-flash-thinking-exp",
-        contents=f"""You are a cybersecurity expert.
-        Analyze this cyber incident and give insights.
+        conn = connect_database()
+        cursor = conn.cursor()
 
-        Severity: {severity}
-        Description: {description}
-        """
-    )
-    return response.text
+        # dictionary of field → value
+        field_map = {
+        "date": date,
+        "incident_type": incident_type,
+        "severity": severity,
+        "status": status,
+        "description": description,
+        "reported_by": reported_by,
+        }
+
+        #create list to store changes
+        fields = []
+        values = []
+
+        for field, value in field_map.items():
+            if value is not None:
+                fields.append(f"{field} = ?")
+                values.append(value)
+
+        # Only run the update if at least one field is being changed
+        if fields:
+            sql = f"UPDATE cyber_incidents SET {', '.join(fields)} WHERE id = ?"
+            values.append(incident_id)
+            cursor.execute(sql, values)
+            conn.commit()
+
+        rows = cursor.rowcount
+        conn.close()
+
+        # Write to CSV if something changed
+        if fields:
+            write_header = not self.csv_path.exists() or self.csv_path.stat().st_size == 0
+
+            with open(self.csv_path, "a", newline='', encoding="utf-8") as f:
+                writer = csv.writer(f)
+
+                if write_header:
+                    writer.writerow([
+                        "incident_id", "date", "incident_type",
+                        "severity", "status", "description", "reported_by"
+                    ])
+
+                writer.writerow([
+                    incident_id, date, incident_type,
+                    severity, status, description, reported_by
+                ])
+
+            return incident_id
+
+
+    # AI Analysis
+    def analyze_incident(self, description, severity):
+        response = client.models.generate_content(
+            model="gemini-2.0-flash-thinking-exp",
+            contents=f"""
+                You are a cybersecurity expert.
+                Analyze this cyber incident and give insights.
+
+                Severity: {severity}
+                Description: {description}
+            """
+        )
+        return response.text

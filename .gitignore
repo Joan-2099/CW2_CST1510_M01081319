@@ -11,7 +11,7 @@ env/
 sample_Data.csv
 append.py
 api.py
-python-version
+.python-version
 
 .env
 

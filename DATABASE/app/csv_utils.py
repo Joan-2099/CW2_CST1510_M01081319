@@ -41,10 +41,10 @@ def load_csv_to_table(conn, csv_path, table_name):
 # Connect to the database
 conn = connect_database("DATA/intelligence_platform.db")
 
-# Path to your CSV file
+# Path to CSV file
 csv_path = "DATA/cyber_test.csv"
 
-# Name of the table in your database
+# Name of the table in database
 table_name = "cyber_incidents"
 
 # Call the function

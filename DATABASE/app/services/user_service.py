@@ -1,7 +1,10 @@
 import bcrypt
 from pathlib import Path
 import sqlite3
-from DATABASE.app.data.users import get_user_by_username, insert_user
+import streamlit as st
+from streamlit.runtime.scriptrunner import RerunException
+from streamlit.runtime.scriptrunner import get_script_run_ctx
+from DATABASE.app.data.users import Users
 from DATABASE.app.data.schema import create_users_table
 from DATABASE.app.data.db import connect_database
 
@@ -10,108 +13,139 @@ from DATABASE.app.data.db import connect_database
 DATA_DIR = Path(__file__).parent / "DATA"
 DB_PATH = DATA_DIR / "intelligence_platform.db"
 
-def migrate_users_from_file(filepath=DATA_DIR / "users.txt"):
-    """Migrate users from a text file into the users table."""
-    conn = connect_database()
+users = Users() 
 
-    # Ensure users table exists
-    create_users_table(conn)
+class UserService:
+    def __init__(self, dbs_path):
+        self.dbs_path = dbs_path
 
-    if not filepath.exists():
-        print(f"⚠️ File not found: {filepath}")
+    def migrate_users_from_file(filepath=DATA_DIR / "users.txt"):
+        """Migrate users from a text file into the users table."""
+        conn = connect_database()
+
+        # Ensure users table exists
+        create_users_table(conn)
+
+        if not filepath.exists():
+            print(f"⚠️ File not found: {filepath}")
+            conn.close()
+            return
+
+        cursor = conn.cursor()
+        migrated_count = 0
+
+        with open(filepath, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+
+                # Parse line: username,password_hash
+                parts = line.split(',')
+                if len(parts) >= 2:
+                    username = parts[0].strip()
+                    password_hash = parts[1].strip()
+
+                    try:
+                        cursor.execute(
+                            "INSERT OR IGNORE INTO users (username, password_hash, role) VALUES (?, ?, ?)",
+                            (username, password_hash, 'user')
+                        )
+                        if cursor.rowcount > 0:
+                            migrated_count += 1
+                    except sqlite3.Error as e:
+                        print(f"Error migrating user {username}: {e}")
+
+        conn.commit()
         conn.close()
-        return
+        print(f"✅ Migrated {migrated_count} users from {filepath.name}")
 
-    cursor = conn.cursor()
-    migrated_count = 0
+    def insert_user(self,username, password_hash, role):
+        conn = connect_database()
+        cursor = conn.cursor()
+        #using error handling to display error message for taken username
+        try:
+            # Check if username already exists
+            cursor.execute("SELECT 1 FROM users WHERE username = ?", (username,))
+            if cursor.fetchone():
+                return False, f"The username '{username}' is already taken."
 
-    with open(filepath, 'r') as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
+            # Insert new user
+            cursor.execute(
+                "INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)",
+                (username, password_hash, role)
+            )
+            conn.commit()
+            return True, f"User '{username}' inserted successfully."
+        except sqlite3.Error as e:
+            # This happens if username already exists
+            return False, f"Database error: {e}"
+        finally:
+            conn.close()
 
-            # Parse line: username,password_hash
-            parts = line.split(',')
-            if len(parts) >= 2:
-                username = parts[0].strip()
-                password_hash = parts[1].strip()
-
-                try:
-                    cursor.execute(
-                        "INSERT OR IGNORE INTO users (username, password_hash, role) VALUES (?, ?, ?)",
-                        (username, password_hash, 'user')
-                    )
-                    if cursor.rowcount > 0:
-                        migrated_count += 1
-                except sqlite3.Error as e:
-                    print(f"Error migrating user {username}: {e}")
-
-    conn.commit()
-    conn.close()
-    print(f"✅ Migrated {migrated_count} users from {filepath.name}")
-
-
-def register_user(username, password, role):
-    """Register new user with password hashing."""
-    # Hash password
-    password_hash = bcrypt.hashpw(password.encode('utf-8'),
-        bcrypt.gensalt()
-    ).decode('utf-8')
-    
-    # Insert into database
-    insert_user(username, password_hash, role)
-    return True, f"User '{username}' registered successfully."
-
-
-def login_user(username, password):
-    """Authenticate user."""
-    #check if username doesnt exist
-    user = get_user_by_username(username)
-    if not user:
-        return False, "User not found."
-
-    #check if fields are empty
-    elif username ==" ":
-        return False, "Please enter username", None
-    
-    elif password == " ":
-        return False, "Please enter password", None
-    # Verify password
-    stored_hash = user[2]  # password_hash column
-    role = user[3]#this gets role from Database
-    
-    if bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8')):
-        return True, f"Login successful!",role
-
-    else:
-        return False, "Incorrect password.", None
+    def register_user(self,username, password, role):
+        """Register new user with password hashing."""
+        valid_username, msg = Users.validate_username(username)
+        if not valid_username:
+            return False, msg
+        valid_pass, msg = Users.validate_password(password)
+        if not valid_pass:
+            return False, msg
+        
+        # Hash password
+        password_hash = bcrypt.hashpw(password.encode('utf-8'),
+            bcrypt.gensalt()
+        ).decode('utf-8')
+        
+        # Insert into database
+        valid_insert, msg = self.insert_user(username, password_hash, role)
+        if not valid_insert:
+            return False, msg
+        return True, msg
 
 
-def validate_username(user_name):
-    # check the length of the user name
-    if len(user_name) < 4:
-        return False, "Username must be at least 4 characters long\n"
-    # check if there is a space
-    if " " in user_name:
-        return False, "Username cannot contain spaces"
-    return True, ""
+    def login_user(self,username, password):
+        """Authenticate user."""
+        
+        user_data = users.get_user_by_username(username)
+        
+        #check if fields are empty
+        if not username.strip():
+            return False, "Please enter username"
+        
+        if not password.strip() :
+            return False, "Please enter password"
+        
+        #check if username doesnt exist
+        if not user_data:
+            return False, "User not found."
+        # Verify password
+        stored_hash = user_data[2]  # password_hash column
+        role = user_data[3]#this gets role from Database
+        
+        if bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8')):
+            return True, f"Login successful!",role
+
+        else:
+            return False, "Incorrect password.", None
+
+  
 
 
-def validate_password(password):
-    # check for password length
-    if len(password) < 8:
-        return False, "Password must be atleast 8 characters long"
+    #function to ensure users remain logged in or locked out if not logged in
+    @staticmethod
+    def require_login(role=None):
+        if not st.session_state.get("logged_in", False):
+            st.warning("You must be logged in to access this page.")
+            st.stop()
 
-    if ' ' in password:
-        return False, "Password should not have spaces"
+        if role is not None and st.session_state.get("role") != role:
+            st.warning(f"This page is restricted to {role}")
+            st.stop()
 
-    has_upper = any(p.isupper() for p in password)
-    has_lower = any(p.islower() for p in password)
-    has_number = any(p.isdigit() for p in password)
-    has_special = any(p in "@$*#%^_!*&" for p in password)
-
-    if not (has_upper and has_lower and has_number and has_special):
-        return False, "Password must contain:\nAt least one uppercase letter\nAt least one number\nAt least one lowercase letter\nAt least one special character (@$*#%^_!*&)"
-
-    return True, ""
+    @staticmethod
+    def logout():
+        """Clear session state and refresh page to enforce login."""
+        ctx = get_script_run_ctx()
+        if ctx is not None:
+            raise RerunException(ctx)

@@ -6,9 +6,13 @@ from pathlib import Path
 project_root = Path("/Users/joanmartha/Desktop/CST1510_CS2")
 sys.path.append(str(project_root))
 
-from DATABASE.app.data.users import verify_user_name
-from DATABASE.app.services.user_service import login_user
+from DATABASE.app.services.user_service import UserService
 from DATABASE.app.data.db import connect_database
+
+# Define the absolute path to the database
+DB_FILE_PATH = project_root / "DATA" / "intelligence_platform.db"
+
+user_service = UserService(str(DB_FILE_PATH))
 
 # connencting to database
 conn = connect_database("DATA/intelligence_platform.db")
@@ -38,22 +42,14 @@ with st.form("Login"):
         login = st.form_submit_button("Login")
         #logging user in
         if login:
-            is_valid, error_msg, role = login_user(username, password)
+            is_valid, error_msg, role = user_service.login_user(username, password)
             if not is_valid:
                 st.error(f"Error: {error_msg}")
             else:
-                st.success("Incident added successfully!")
+                st.success(f"{username} logged insuccessfully!")
                 st.session_state["username"]=username
-                st.session_state["role"]=  role
-                st.success(f"Welcome, {username}!")
-                
-                #redirect user based on role
-                if role == "staff":
-                    st.switch_page("pages/IT_staff.py")
-
-                else:
-                  st.switch_page("pages/IT_users.py")
-        
+                st.session_state["role"]=role
+                st.switch_page("pages/main_dash.py")
     with col2:
         new_acc=st.form_submit_button("Create new acount")
         st.markdown("If you don't have account")

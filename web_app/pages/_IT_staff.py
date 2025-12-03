@@ -10,10 +10,15 @@ client = genai.Client(api_key=api_key)
 project_root = Path("/Users/joanmartha/Desktop/CST1510_CS2")
 sys.path.append(str(project_root))
 
-from DATABASE.app.data.new_ticks import get_all_tickets, get_ticket_by_id, assign_ticket
+from DATABASE.app.data.tickets import Tickets
 from DATABASE.app.data.db import connect_database
-from DATABASE.app.utils.auth import require_login
+from DATABASE.app.services.user_service import UserService
+from DATABASE.app.services.session import init_session
 
+# Define the absolute path to the database
+DB_FILE_PATH = project_root / "DATA" / "intelligence_platform.db"
+
+tickets_manager = Tickets()
 
 st.set_page_config(
     page_title="IT Staff",
@@ -21,26 +26,19 @@ st.set_page_config(
     layout="centered"
 )
 
-
 st.title("🛠️IT Staff")
-if "username" not in st.session_state:
-    st.session_state["username"] = None
-if "role" not in st.session_state:
-    st.session_state["role"] = None
-  
+
+init_session()
 #ensure staff is logged in
-require_login(role="staff")
+UserService.require_login(role="staff")
 
 # Get tickets as DataFrame
-df = get_all_tickets(as_df=True)
-st.dataframe(df, use_container_width=True)
+df = tickets_manager.get_all_tickets()
+st.dataframe(df)
 
 #CONNECT TO DB
 conn = connect_database("DATA/intelligence_platform.db")
 
-
-
-tickets = get_all_tickets()
 unassigned = df[df["assigned_to"] == "Unassigned"]
 
 
@@ -57,7 +55,7 @@ else:
             # Assign button + update status
             if st.button(f"Assign ticket #{row.id} to me", key=f"assign_{row.id}"):
                 # Assign to current user
-                assign_ticket(row.id, st.session_state["username"])
+                tickets_manager.assign_ticket(row.id, st.session_state["username"])
                 
                 # Optional: update status to "In Progress"
                 conn = connect_database("DATA/intelligence_platform.db")

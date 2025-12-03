@@ -2,3 +2,8 @@ incident_id,date,incident_type,severity,status,description,reported_by
 7,2025-11-25,Masquerading,Low,In Progress,False advertisement,Mavin
 8,2025-11-25,Phishing,Critical,Resolved,Suspicious email detected,Hilary
 13,2025-11-26,Malware Attacks,Medium,Open,Trojan virus,Havana
+106,2025-12-02,Phising,Medium,Open,Many false advertisements,Bernice
+107,2025-12-03,Phising,High,Open,Multiple false accounts detected,Marcus
+108,2025-12-03,Phising,Critical,In Progress,Multiple accounts leaked,Marcus
+109,2025-12-03,Data Breach,Low,Open,Passwords leaked,Jerry
+110,2025-12-03,Masquerading,Medium,Open,False account,Hank

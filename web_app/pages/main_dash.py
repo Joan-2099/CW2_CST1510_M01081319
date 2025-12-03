@@ -4,15 +4,13 @@ import streamlit as st
 
 project_root = Path("/Users/joanmartha/Desktop/CST1510_CS2")
 sys.path.append(str(project_root))
+from DATABASE.app.services.session import init_session
+from DATABASE.app.services.user_service import UserService
+DB_FILE_PATH = project_root / "DATA" / "intelligence_platform.db"
 
-from DATABASE.app.utils.auth import require_login
 
 st.title("Main dash")
-if "username" not in st.session_state:
-    st.session_state["username"] = None
-if "role" not in st.session_state:
-    st.session_state["role"] = None
-    
-require_login(role="user")
+init_session()
+UserService.require_login(role="user")
 
 st.write("Well logged in")

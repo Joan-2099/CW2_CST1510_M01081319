@@ -7,28 +7,30 @@ sys.path.append(str(project_root))
 
 import streamlit as st
 from DATABASE.app.data.db import connect_database
-from DATABASE.app.data.incidents import get_all_incidents, insert_incident, analyze_incident
-from DATABASE.app.utils.auth import require_login, logout
+from DATABASE.app.data.incidents import Incidents
+from DATABASE.app.services.user_service import UserService
+from DATABASE.app.services.session import init_session
 
+DB_FILE_PATH = project_root / "DATA" / "intelligence_platform.db"
 
 # connencting to database
 conn = connect_database("DATA/intelligence_platform.db")
 
-st.title("Cyber Incidents Dashboard")
-if "username" not in st.session_state:
-    st.session_state["username"] = None
-if "role" not in st.session_state:
-    st.session_state["role"] = None
+#initialize session state
+init_session()
+UserService.require_login(role="user")
 
-require_login(role="user")
+#call class name
+incidents_manager= Incidents()
   
-incidents = get_all_incidents()
-st.dataframe(incidents, use_container_width=True)
+# fetch
+df = incidents_manager.get_all_incidents()
+st.dataframe(df)
 
 # Build options: "ID — Incident Type (Severity)"
 options = [
     f"{row['id']} — {row['incident_type']} ({row['severity']})"
-    for _, row in incidents.iterrows()
+    for _, row in df.iterrows()
 ]
 
 # Selectbox with searchable input
@@ -40,10 +42,10 @@ selected = st.selectbox(
 
 if selected:
     incident_id = int(selected.split(" — ")[0])
-    incident = incidents[incidents['id'] == incident_id].iloc[0]
+    incident = df[df['id'] == incident_id].iloc[0]
 
     if st.button("AI Analyze Incident", key=f"analyze_{incident_id}"):
-        analysis = analyze_incident(incident['description'], incident['severity'])
+        analysis = incidents_manager.analyze_incident(incident['description'], incident['severity'])
         st.info(analysis)
 
 from datetime import date
@@ -60,13 +62,17 @@ with st.form("New Incident"):
 
     if submitted and title:
         today = date.today().isoformat()
-        insert_incident(today, title, severity, status, description,reported_by)
+        incidents_manager.insert_incident(today, title, severity, status, description,reported_by)
         st.success("Incident added successfully!")
+        st.rerun()
+
 
 st.divider()
 
 if st.button("Log out"):
-    st.session_state.clear()
-    logout()
+    st.session_state.logged_in = False
+    st.session_state.username = None
+    st.session_state.role = None
+    st.experimental_rerun()
 
     

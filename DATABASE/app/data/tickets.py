@@ -1,109 +1,130 @@
 import csv
-from datetime import datetime
 import os
+import pandas as pd
+from datetime import datetime
 from DATABASE.app.data.db import connect_database
 
-# connencting to database
-conn = connect_database("DATA/intelligence_platform.db")
+CSV_PATH = os.path.join("DATA", "it_tickets.csv")
 
-def get_ticket_by_id(ticket_id):
-    """Fetch an IT ticket by its ID."""
-    conn = connect_database()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM it_tickets WHERE id = ?", (ticket_id,))
-    ticket = cursor.fetchone()
-    conn.close()
-    return ticket
+class Tickets:
+    def __init__(self, csv_path=CSV_PATH):
+        self.csv_path = csv_path
+        self.conn = connect_database()  # optional: you can keep a persistent connection if desired
 
+    # Insert a new ticket into the database and sync it to the CSV file
+    def save_to_csv(self, tickets, headers=None):
+        """Save a list of tickets to CSV."""
+        if not tickets:
+            return
 
-def insert_ticket(title, description, status="open", assigned_to="unassigned"):
-    # Generate ticket ID
-    ticket_id = int(datetime.now().timestamp())
+        if headers is None:
+            if isinstance(tickets[0], dict):
+                headers = tickets[0].keys()
+            else:  # tuple from DB
+                headers = ["id", "title", "description", "status", "assigned_to",
+                           "date_created", "resolved_date", "created_at"]
 
-    # Save to CSV
-    csv_path = os.path.join("DATA", "it_tickets.csv")
-    file_exists = os.path.isfile(csv_path)
-
-    with open(csv_path, mode="a", newline="", encoding="utf-8") as file:
-        writer = csv.writer(file)
-        if not file_exists:
-            writer.writerow(["id", "title", "description", "status", "assigned_to"])
-        writer.writerow([ticket_id, title, description, status, assigned_to])
-
-    # Save to Database
-    conn = connect_database()
-    cursor = conn.cursor()
-    cursor.execute(
-        "INSERT INTO it_tickets (title, description, status, assigned_to) VALUES (?, ?, ?, ?)",
-        (title, description, status, assigned_to)
-    )
-    conn.commit()
-    new_ticket_id = cursor.lastrowid  # get the ID SQLite assigned
-    conn.close()
-
-    return new_ticket_id
+        with open(self.csv_path, "w", newline="", encoding="utf-8") as file:
+            writer = csv.writer(file)
+            writer.writerow(headers)
+            for ticket in tickets:
+                if isinstance(ticket, dict):
+                    writer.writerow([ticket[h] for h in headers])
+                else:  # tuple from DB
+                    writer.writerow(ticket)
 
 
+    def sync_csv_from_db(self):
+        """Fetch all tickets from DB and save to CSV."""
+        tickets = self.get_all_tickets()
+        if tickets:
+            if isinstance(tickets[0], tuple):
+                headers = ["id", "title", "description", "status", "assigned_to",
+                           "date_created", "resolved_date", "created_at"]
+            else:
+                headers = tickets[0].keys()
+        else:
+            headers = None
+        self.save_to_csv(tickets, headers)
 
-def get_all_tickets():
-    """Fetch all IT tickets."""
-    conn = connect_database()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM it_tickets")
-    tickets = cursor.fetchall()
-    conn.close()
-    return tickets
+    #CRUD Operations
+    def insert_ticket(self, title, description, status="open", assigned_to="unassigned"):
+        conn = connect_database()
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO it_tickets (title, description, status, assigned_to, date_created) VALUES (?, ?, ?, ?, ?)",
+            (title, description, status, assigned_to, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        )
+        conn.commit()
+        ticket_id = cursor.lastrowid
+        conn.close()
 
-def assign_ticket(ticket_id, staff_member):
-    #save in csv
-    file_path = os.path.join("DATA", "it_tickets.csv")
+        self.sync_csv_from_db()
+        return ticket_id
 
-    rows = []
-    with open(file_path, "r", newline="", encoding="utf-8") as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            if str(row["id"]) == str(ticket_id):
-                row["assigned_to"] = staff_member
-            rows.append(row)
+    def get_ticket_by_id(self, ticket_id):
+        conn = connect_database()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM it_tickets WHERE id=?", (ticket_id,))
+        ticket = cursor.fetchone()
+        conn.close()
+        return ticket
 
-    with open(file_path, "w", newline="", encoding="utf-8") as file:
-        writer = csv.DictWriter(file, fieldnames=rows[0].keys())
-        writer.writeheader()
-        writer.writerows(rows)
-    
-    #save in dbs
-    conn = connect_database()
-    cursor = conn.cursor()
-    cursor.execute("""
-        UPDATE it_tickets
-        SET assigned_to = ?
-        WHERE id = ?
-    """, (staff_member, ticket_id))
-    conn.commit()
-    conn.close()
+    #Fetch all tickets from the database
+    def get_all_tickets(self, as_df=False):
+        conn = connect_database()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM it_tickets")
+        tickets = cursor.fetchall()
+        headers = [desc[0] for desc in cursor.description]
+        conn.close()
 
-def update_ticket_status(ticket_id, new_status):
-    file_path = os.path.join("DATA", "it_tickets.csv")
+        if as_df:
+            return pd.DataFrame(tickets, columns=headers)
+        return tickets
 
-    rows = []
-    with open(file_path, "r", newline="", encoding="utf-8") as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            if str(row["ticket_id"]) == str(ticket_id):
-                row["status"] = new_status
-            rows.append(row)
+    #Fetch tickets that are not yet assigned to any staff member
+    def get_unassigned_tickets(self):
+        conn = connect_database()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM it_tickets WHERE assigned_to='unassigned'")
+        tickets = cursor.fetchall()
+        conn.close()
+        return tickets
 
-    with open(file_path, "w", newline="", encoding="utf-8") as file:
-        writer = csv.DictWriter(file, fieldnames=rows[0].keys())
-        writer.writeheader()
-        writer.writerows(rows)
+    #Fetch all tickets assigned to a specific staff member
+    def get_staff_tickets(self, staff_member):
+        conn = connect_database()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM it_tickets WHERE assigned_to=?", (staff_member,))
+        tickets = cursor.fetchall()
+        conn.close()
+        return tickets
 
-    # Update DATABASE
-    conn = connect_database()
-    cursor = conn.cursor()
-    cursor.execute(
-        "UPDATE it_tickets SET status = ? WHERE id = ?",
-        (new_status, ticket_id)
-    )
-    conn.commit()
-    conn.close()
+    #Assign a ticket to a staff member
+    def assign_ticket(self, ticket_id, staff_member):
+        conn = connect_database()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE it_tickets SET assigned_to=? WHERE id=?", (staff_member, ticket_id))
+        conn.commit()
+        conn.close()
+        self.sync_csv_from_db()
+
+    #Update the status of a ticket
+    def update_ticket_status(self, ticket_id, new_status):
+        conn = connect_database()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE it_tickets SET status=? WHERE id=?", (new_status, ticket_id))
+        conn.commit()
+        conn.close()
+        self.sync_csv_from_db()
+
+    #Delete a ticket from the database by its ID.
+    def delete_ticket(self, ticket_id):
+        conn = connect_database()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM it_tickets WHERE id=?", (ticket_id,))
+        conn.commit()
+        conn.close()
+        #update csv after deletion
+        self.sync_csv_from_db()

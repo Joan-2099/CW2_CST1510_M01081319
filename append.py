@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 from DATABASE.app.data.db import connect_database
-from DATABASE.app.data.csv_utils import load_csv_to_table
+from DATABASE.app.csv_utils import load_csv_to_table
 # --- DB connection ---
 conn = connect_database("DATA/intelligence_platform.db")
 table_name = "cyber_incidents"
