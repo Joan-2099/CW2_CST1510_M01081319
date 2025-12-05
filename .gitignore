@@ -13,6 +13,7 @@ append.py
 api.py
 .python-version
 
+.ipynb_checkpoints/
 .env
 
 # VS Code workspace settings
