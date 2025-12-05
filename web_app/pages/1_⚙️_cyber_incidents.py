@@ -1,5 +1,9 @@
 import sys
 from pathlib import Path
+import pandas as pd
+import plotly.express as px
+import matplotlib.pyplot as plt
+from datetime import date
 
 # Absolute path to project root
 project_root = Path("/Users/joanmartha/Desktop/CST1510_CS2")
@@ -10,21 +14,37 @@ from DATABASE.app.data.db import connect_database
 from DATABASE.app.data.incidents import Incidents
 from DATABASE.app.services.user_service import UserService
 from DATABASE.app.services.session import init_session
+from DATABASE.app.data.api import API_analyzer
 
-DB_FILE_PATH = project_root / "DATA" / "intelligence_platform.db"
+api_analyze= API_analyzer()
 
-# connencting to database
-conn = connect_database("DATA/intelligence_platform.db")
+st.set_page_config(
+    page_title="Cyber_Incidents",
+    page_icon="🛠️",
+    layout="wide"
+)
+st.title("Cyber Incidents page")
 
 #initialize session state
 init_session()
 UserService.require_login(role="user")
 
-#call class name
-incidents_manager= Incidents()
-  
-# fetch
+
+if "incidents_manager" not in st.session_state:
+    conn = connect_database()
+    st.session_state.incidents_manager = Incidents(conn)
+
+incidents_manager = st.session_state.incidents_manager
+
+# fetch data
 df = incidents_manager.get_all_incidents()
+
+#Correct mispelt and duplicate incident
+df['incident_type'] = df['incident_type'].str.strip().str.title()
+
+df['incident_type'] = df['incident_type'].replace({
+    'Phising': 'Phishing',  # merge misspelling
+})
 st.dataframe(df)
 
 # Build options: "ID — Incident Type (Severity)"
@@ -45,11 +65,15 @@ if selected:
     incident = df[df['id'] == incident_id].iloc[0]
 
     if st.button("AI Analyze Incident", key=f"analyze_{incident_id}"):
-        analysis = incidents_manager.analyze_incident(incident['description'], incident['severity'])
-        st.info(analysis)
+        try:
+            ai_text = api_analyze.analyze_incident(incident['description'], incident['severity'])
+            st.info(ai_text)
+        except Exception as e:
+            st.error(f"AI analysis failed: {e}")
 
-from datetime import date
 
+
+#create input form
 with st.form("New Incident"):
     reported_by=st.text_input("Name")
     title = st.text_input("Incident Title")
@@ -66,6 +90,46 @@ with st.form("New Incident"):
         st.success("Incident added successfully!")
         st.rerun()
 
+#Charts and visualizations
+st.subheader("Bar Chart showin the Severity per Incident")
+st.write(df['incident_type'].value_counts())
+fig = px.bar(
+    df, 
+    x='incident_type',  # column name in df
+    y='severity', 
+    color='incident_type'  # if you want each incident_type to have different colors
+)
+#display bar chart
+st.plotly_chart(fig, use_container_width=True)
+
+
+# Make sure 'date_created' is a datetime column
+df['created_at'] = pd.to_datetime(df['created_at'])
+
+# Select incident type
+incident_choice = st.selectbox("Select Incident Type:", df['incident_type'].unique(),key="incident_choice_linechart")
+
+# Filter dataframe
+df_filtered = df[df['incident_type'] == incident_choice]
+
+# Map severity to numeric values
+severity_map = {"Low": 1, "Medium": 2, "High": 3, "Critical": 4}
+df_filtered['severity_numeric'] = df_filtered['severity'].map(severity_map)
+
+# Sort by date
+df_filtered = df_filtered.sort_values('created_at')
+
+st.subheader(f"Line Chart of Severity Over Time for {incident_choice}")
+
+# Plot
+fig, ax = plt.subplots()
+ax.plot(df_filtered['created_at'], df_filtered['severity_numeric'], marker='o', linestyle='-')
+ax.set_xlabel("Date Created")
+ax.set_ylabel("Severity (1=Low, 4=Critical)")
+ax.set_title(f"Severity Over Time for {incident_choice}")
+ax.grid(True)
+#display line chart
+st.pyplot(fig)
 
 st.divider()
 

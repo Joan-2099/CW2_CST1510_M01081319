@@ -9,13 +9,9 @@ project_root = Path("/Users/joanmartha/Desktop/CST1510_CS2")
 sys.path.append(str(project_root))
 
 from DATABASE.app.services.user_service import UserService
+from DATABASE.app.data.api import API_analyzer
 
-DB_FILE_PATH = project_root / "DATA" / "intelligence_platform.db"
-
-
-api_key = st.secrets["GEMINAI_API_KEY"]
-client = genai.Client(api_key=api_key)
-
+api_analyze= API_analyzer()
 
 st.set_page_config(page_title="Data Science",layout="wide")
 
@@ -59,20 +55,30 @@ elif default_choice != "--None--":
     except Exception as e:
         st.error(f"Error loading default dataset: {e}")
 
+
 if df is not None:
     st.dataframe(df, width=1200, height=600)
     
     # Show a success message and preview the data
     st.success("CSV successfully uploaded!")
+
+    #Update table
+    with st.expander("Update Table"):
+        reported_by=st.text_input("Name")
+        title = st.text_input("Incident Title")
+        severity = st.selectbox("Severity", ["Low", "Medium", "High", "Critical"])
+        status = st.selectbox("Status", ["Open", "In Progress", "Resolved"])
+        description = st.text_area("Description")
+  
     #display basic info about the CSV and list
     st.subheader("CSV Summary")
     st.write("Number of rows:", len(df))
     num_columns = len(df.columns)
     st.write(f"Number of columns: {num_columns}")
-    st.write(df.head())
-        
-        #ensure chart code is withing the if bock to display if file is uploaded 
-        #Display charts
+
+    
+    #ensure chart code is withing the if bock to display if file is uploaded 
+    #Display charts
     st.subheader("⚙️ Charts")
     chart_type=st.radio("Choose a chart type:",["Bar Chart","Pie Chart"])
 
@@ -109,17 +115,7 @@ if df is not None:
     sample_csv = df.head(num_rows).to_csv(index=False)
 
     if st.button("Generate AI Summary"):
-        system_prompt = f"""
-        You are a data science expert.
-        Analyze this CSV dataset sample and provide a plain-English summary.
-        Include patterns, trends, anomalies, and any interesting insights.
-        Columns: {df.dtypes.to_dict()}
-        """
-        with st.spinner("Generating AI summary..."):
-            response = client.models.generate_content(
-                model="gemini-2.0-flash-thinking-exp",
-                contents=f"{system_prompt}\n{sample_csv}"
-            )
-        st.info(response.text)
+        api_analyze.analyze_datasets(df,sample_csv)
+        
 else:
     st.info("Please upload a CSV file to preview it.")

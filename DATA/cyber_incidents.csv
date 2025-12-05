@@ -7,3 +7,4 @@ incident_id,date,incident_type,severity,status,description,reported_by
 108,2025-12-03,Phising,Critical,In Progress,Multiple accounts leaked,Marcus
 109,2025-12-03,Data Breach,Low,Open,Passwords leaked,Jerry
 110,2025-12-03,Masquerading,Medium,Open,False account,Hank
+111,2025-12-04,Phising,High,Open,Multiple false accounts,Haime

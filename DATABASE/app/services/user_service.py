@@ -5,10 +5,11 @@ import streamlit as st
 from streamlit.runtime.scriptrunner import RerunException
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 from DATABASE.app.data.users import Users
-from DATABASE.app.data.schema import create_users_table
+from DATABASE.app.data.schema import TableCreator
 from DATABASE.app.data.db import connect_database
 
-
+conn = connect_database()
+table_creator=TableCreator(conn)
 # Path to the DATA folder within this folder
 DATA_DIR = Path(__file__).parent / "DATA"
 DB_PATH = DATA_DIR / "intelligence_platform.db"
@@ -19,12 +20,12 @@ class UserService:
     def __init__(self, dbs_path):
         self.dbs_path = dbs_path
 
-    def migrate_users_from_file(filepath=DATA_DIR / "users.txt"):
+    def migrate_users_from_file(self,filepath=DATA_DIR / "users.txt"):
         """Migrate users from a text file into the users table."""
         conn = connect_database()
 
         # Ensure users table exists
-        create_users_table(conn)
+        table_creator.create_users_table()
 
         if not filepath.exists():
             print(f"⚠️ File not found: {filepath}")
@@ -103,9 +104,9 @@ class UserService:
             return False, msg
         return True, msg
 
-
-    def login_user(self,username, password):
-        """Authenticate user."""
+    #Authenticate user
+    @staticmethod
+    def login_user(username, password):
         
         user_data = users.get_user_by_username(username)
         
@@ -130,8 +131,6 @@ class UserService:
             return False, "Incorrect password.", None
 
   
-
-
     #function to ensure users remain logged in or locked out if not logged in
     @staticmethod
     def require_login(role=None):

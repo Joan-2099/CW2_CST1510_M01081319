@@ -115,6 +115,7 @@ class Tickets:
         conn = connect_database()
         cursor = conn.cursor()
         cursor.execute("UPDATE it_tickets SET status=? WHERE id=?", (new_status, ticket_id))
+        cursor.execute("UPDATE it_tickets SET resolved_date = TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
         conn.commit()
         conn.close()
         self.sync_csv_from_db()

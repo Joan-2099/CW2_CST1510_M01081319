@@ -9,6 +9,7 @@ sys.path.append(str(project_root))
 from DATABASE.app.services.user_service import UserService
 from DATABASE.app.data.db import connect_database
 
+
 # Define the absolute path to the database
 DB_FILE_PATH = project_root / "DATA" / "intelligence_platform.db"
 
@@ -30,6 +31,9 @@ st.set_page_config(
 st.subheader("Login 🔑")
 login_form = st.form("Login Form")
 
+with st.sidebar:
+    st.markdown("Navigation")
+
 # initialize session state
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -50,7 +54,7 @@ if not st.session_state.logged_in:
             login = st.form_submit_button("Login")
             #logging user in
             if login:
-                is_valid, error_msg, role = user_service.login_user(username, password)
+                is_valid, error_msg, role = UserService.login_user(username, password)
                 if not is_valid:
                     st.error(f"Error: {error_msg}")
                 else:
@@ -73,5 +77,3 @@ else:
         st.session_state.role = None
         st.experimental_rerun()
             
-
-                

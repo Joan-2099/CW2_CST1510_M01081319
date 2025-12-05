@@ -42,7 +42,7 @@ with st.form("Login"):
         login = st.form_submit_button("Login")
         #logging user in
         if login:
-            is_valid, error_msg, role = user_service.login_user(username, password)
+            is_valid, error_msg, role = UserService.login_user(username, password)
             if not is_valid:
                 st.error(f"Error: {error_msg}")
             else:

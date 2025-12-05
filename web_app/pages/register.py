@@ -47,7 +47,8 @@ with st.form("Registration"):
             else:
                 st.success(f"{username} registered succesfully")
                 st.markdown("Would you like to login")
+                
                 login=st.form_submit_button("Login")
                 if login:
-                    st.switch_page("pages/login.py")
+                    st.switch_page("Home.py")
         

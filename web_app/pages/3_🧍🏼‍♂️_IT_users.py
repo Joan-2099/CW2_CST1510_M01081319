@@ -34,7 +34,7 @@ init_session()
 user_serve.require_login(role="user")
 
 # Get tickets as DataFrame
-df = tickets_manager.get_all_tickets()
+df = tickets_manager.get_all_tickets(as_df=True)
 st.dataframe(df)
 
 

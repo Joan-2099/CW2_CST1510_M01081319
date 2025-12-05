@@ -14,7 +14,9 @@ from DATABASE.app.data.tickets import Tickets
 from DATABASE.app.data.db import connect_database
 from DATABASE.app.services.user_service import UserService
 from DATABASE.app.services.session import init_session
+from DATABASE.app.data.api import API_analyzer
 
+api_analyze= API_analyzer()
 # Define the absolute path to the database
 DB_FILE_PATH = project_root / "DATA" / "intelligence_platform.db"
 
@@ -23,7 +25,7 @@ tickets_manager = Tickets()
 st.set_page_config(
     page_title="IT Staff",
     page_icon="🛠️",
-    layout="centered"
+    layout="wide"
 )
 
 st.title("🛠️IT Staff")
@@ -33,7 +35,7 @@ init_session()
 UserService.require_login(role="staff")
 
 # Get tickets as DataFrame
-df = tickets_manager.get_all_tickets()
+df = tickets_manager.get_all_tickets(as_df=True)
 st.dataframe(df)
 
 #CONNECT TO DB
@@ -50,20 +52,17 @@ else:
     for _, row in unassigned.iterrows():
         with st.expander(f"#{row.id} — {row.title}"):
             st.write(f"**Description:** {row.description}")
-            st.write(f"**Status:** {row.status}")
+            
+            #update ticket status
+            new_status =st.selectbox("Update ticket status",["Open","In progress","Resolved"],key ="Change ticket status")
+            if new_status:
+                tickets_manager.update_ticket_status(row.id, new_status)
 
             # Assign button + update status
             if st.button(f"Assign ticket #{row.id} to me", key=f"assign_{row.id}"):
                 # Assign to current user
                 tickets_manager.assign_ticket(row.id, st.session_state["username"])
-                
-                # Optional: update status to "In Progress"
-                conn = connect_database("DATA/intelligence_platform.db")
-                cursor = conn.cursor()
-                cursor.execute(
-                    "UPDATE tickets SET status = ? WHERE id = ?",
-                    ("In Progress", row.id)
-                )
+
                 conn.commit()
                 conn.close()
                 
@@ -73,20 +72,12 @@ else:
 #AI Analysis
 st.subheader("AI Ticket Analysis")
 ticket_options = [f"{row.id} — {row.title}" for _, row in df.iterrows()]
-selected = st.selectbox("Select or search a ticket", ticket_options)
+selected = st.selectbox("Select or search a ticket", ticket_options, key ="AI analyzer ticket")
 
 if selected:
     ticket_id = int(selected.split(" — ")[0])
     ticket_row = df[df["id"] == ticket_id].iloc[0]
 
     if st.button(f"Analyze Ticket #{ticket_id}", key=f"analyze_{ticket_id}"):
-        system_prompt = f"""
-        You are an IT operations expert.
-        Analyze this ticket and provide troubleshooting suggestions, potential causes, and priority recommendations.
-        """
-        with st.spinner("Analyzing ticket with AI..."):
-            response = client.models.generate_content(
-                model="gemini-2.0-flash-thinking-exp",
-                contents=f"{system_prompt}\nTicket Title: {ticket_row.title}\nDescription: {ticket_row.description}"
-            )
-        st.info(response.text)
+        ai_text=api_analyze.analyze_it_tickets(ticket_row)
+        st.info(ai_text)
