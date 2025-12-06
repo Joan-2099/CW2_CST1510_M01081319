@@ -37,9 +37,10 @@ class TableCreator:
                 status TEXT NOT NULL,
                 description TEXT,
                 reported_by TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             )
         """)
+        #TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         self.conn.commit()
         print("cyber_incidents table created successfully.")
 

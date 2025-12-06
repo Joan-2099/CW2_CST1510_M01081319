@@ -1,5 +1,6 @@
 from app.data.db import connect_database
 
+
 # Verify users were migrated
 conn = connect_database()
 cursor = conn.cursor()
@@ -8,7 +9,7 @@ cursor = conn.cursor()
 cursor.execute("SELECT id, username, role FROM users")
 users = cursor.fetchall()
 
-print(" Users in database:")
+print(f" Users in database:{users}")
 print(f"{'ID':<5} {'Username':<15} {'Role':<10}")
 print("-" * 35)
 for user in users:

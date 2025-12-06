@@ -1,5 +1,10 @@
-import sqlite3
+import sys
 from pathlib import Path
+import sqlite3
+
+project_root = Path("/Users/joanmartha/Desktop/CST1510_CS2")
+sys.path.append(str(project_root))
+
 from DATABASE.app.data.schema import TableCreator
 
 DB_PATH = Path("DATA") / "intelligence_platform.db"
@@ -24,8 +29,18 @@ def init_database():
     conn.close()
     print("Database initialized and tables created.")
 
+#function to wipe table data
+def wipe_table(table_name):
+    conn = connect_database()  
+    try:
+        cursor = conn.cursor()
+        cursor.execute(f"DELETE FROM {table_name}")  # remove all rows
+        cursor.execute(f"DELETE FROM sqlite_sequence WHERE name='{table_name}'")  # reset autoincrement IDs
+        conn.commit()
+        print(f"Table '{table_name}' has been wiped clean.")
+    finally:
+        cursor.close()
+        conn.close()
 
-
-
-
-    
+#table_name = "cyber_incidents"
+#wipe_table(table_name)

@@ -90,6 +90,54 @@ with st.form("New Incident"):
         st.success("Incident added successfully!")
         st.rerun()
 
+#convert created_at column into a datetime
+df['created_at'] = pd.to_datetime(df['created_at'])
+
+#treands grouped by months
+trend = df.groupby([
+    'incident_type',
+    df['created_at'].dt.to_period('M')   # group by Month/Year automatically
+]).size().reset_index(name='count')
+
+# If created_at is a period
+trend['created_at'] = trend['created_at'].dt.to_timestamp()
+
+# Make sure it's datetime
+trend['created_at'] = pd.to_datetime(trend['created_at'])
+
+# Now subtract one month safely
+latest_month = trend['created_at'].max()
+prev_month = latest_month - pd.DateOffset(months=1)
+
+#extract counts for those two motnhs
+latest = trend[trend['created_at'] == latest_month]
+previous = trend[trend['created_at'] == prev_month]
+
+#one line per incident
+merge = latest.merge(
+    previous, 
+    on='incident_type', 
+    how='left',
+    suffixes=('_latest', '_prev')
+)
+
+#calculate the percentage change
+merge['change'] = (
+    (merge['count_latest'] - merge['count_prev']) 
+    / merge['count_prev'].replace(0, 1)#this is done to avaid division by zero
+) * 100
+
+#identify the top spiking threat
+top_spike = merge.sort_values('change', ascending=False).iloc[0]
+
+#display the spiking metric as a percentage
+st.metric(
+    "Fastest Growing Threat", 
+    top_spike['incident_type'], 
+    f"{top_spike['change']:.1f}%"
+)
+
+
 #Charts and visualizations
 st.subheader("Bar Chart showin the Severity per Incident")
 st.write(df['incident_type'].value_counts())

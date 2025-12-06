@@ -1,7 +1,7 @@
 import os
 import pandas as pd
-import sqlite3
-from DATABASE.app.data.db import connect_database
+
+from data.db import connect_database
 
 def load_csv_to_table(conn, csv_path, table_name):
     if not os.path.isfile(csv_path):
@@ -14,7 +14,7 @@ def load_csv_to_table(conn, csv_path, table_name):
             print(f"Warning: CSV file '{csv_path}' is empty.")
             return 0
 
-        expected_columns = ["date", "incident_type", "severity", "status", "description", "reported_by"]
+        expected_columns = ["date", "incident_type", "severity", "status", "description", "reported_by","created_at"]
         df = df[expected_columns]
 
         # Read existing records
@@ -42,7 +42,7 @@ def load_csv_to_table(conn, csv_path, table_name):
 conn = connect_database("DATA/intelligence_platform.db")
 
 # Path to CSV file
-csv_path = "DATA/cyber_test.csv"
+csv_path = "DATA/new_incidents.csv"
 
 # Name of the table in database
 table_name = "cyber_incidents"

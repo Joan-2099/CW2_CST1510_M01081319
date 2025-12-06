@@ -1,8 +1,7 @@
 import bcrypt
 from app.data.db import connect_database
 from app.data.schema import create_all_tables
-from app.services.user_service import register_user, login_user, migrate_users_from_file
-from app.data.incidents import insert_incident, get_all_incidents
+from app.services.user_service import UserService
 from app.data.db import init_database
 
 
@@ -11,7 +10,7 @@ def display_menu():
     print("[2] Login")
     print("[3] Exit")
 
-
+register_user, login_user, migrate_users_from_file
 def validate_username(user_name):
     # check the length of the user name
     if len(user_name) < 4:

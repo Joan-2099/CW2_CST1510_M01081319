@@ -10,7 +10,7 @@ env/
 .streamlit/secrets.toml
 sample_Data.csv
 append.py
-api.py
+
 .python-version
 
 .ipynb_checkpoints/
