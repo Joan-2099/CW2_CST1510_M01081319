@@ -11,7 +11,7 @@ DB_PATH = Path("DATA") / "intelligence_platform.db"
 
 
 #Connect to SQLite database.
-def connect_database(db_path=DB_PATH):
+def connect_database(db_path=DB_PATH,check_same_thread=False):
     """Connect to SQLite database."""
      # Convert to Path if it’s a string
     db_path = Path(db_path) if isinstance(db_path, str) else db_path

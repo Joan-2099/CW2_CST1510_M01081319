@@ -27,7 +27,7 @@ st.title("Cyber Incidents page")
 
 #initialize session state
 init_session()
-
+conn = connect_database()
 
 df = None
 tab1, tab2 = st.tabs(["Incidents","Incidents manager"])
@@ -49,10 +49,7 @@ with tab1:
             # Show error if the CSV cannot be read
             st.error(f"Error reading CSV file: {e}")
 
-    if "incidents_manager" not in st.session_state:
-        conn = connect_database()
-        st.session_state.incidents_manager = Incidents(conn)
-
+    st.session_state.incidents_manager = Incidents(conn)
     incidents_manager = st.session_state.incidents_manager
 
     # fetch data
@@ -176,42 +173,60 @@ with tab1:
     for i, status in enumerate(["Open", "In Progress", "Resolved"]):
         cols[i].metric(f"{status}", status_counts.get(status, 0))
 
+    #numbers of incidents by incident type with donut chart
+    col1,col2 = st.columns(2)
+    with col1:
+        # Count of each incident type
+        incident_counts = df['incident_type'].value_counts().reset_index()
+        incident_counts.columns = ['Incident Type', 'Count']
 
-    #bottleneck
-    # Convert created_at to datetime if not already
-    df['resolved_at'] = pd.to_datetime(df['resolved_at'], errors='coerce')
-    df['created_at'] = pd.to_datetime(df['created_at'])
+        # Create donut chart
+        fig = px.pie(
+            incident_counts,
+            names='Incident Type',
+            values='Count',
+            hole=0.4,  # This creates the hole in the middle
+            color_discrete_sequence=px.colors.qualitative.Set3  # For custom colours
+        )
 
-    # Compute resolution time in days
-    df['resolution_days'] = (df['resolved_at'] - df['created_at']).dt.days
+        fig.update_traces(
+            textposition='inside',
+            textinfo='percent+label'  # Shows both percentage and label inside slices
+        )
 
-    avg_resolution = df.groupby('incident_type')['resolution_days'].mean().sort_values(ascending=False)
-    st.subheader("Average Resolution Time by Incident Type (days)")
-    st.dataframe(avg_resolution)
+        fig.update_layout(
+            title_text='Incident Type Breakdown',
+            annotations=[dict(text='Incidents', x=0.5, y=0.5, font_size=20, showarrow=False)]
+        )
 
-    #display bottleneck with chart
-    fig = px.bar(
-        avg_resolution, 
-        x=avg_resolution.index, 
-        y='resolution_days',
-        labels={'x': 'Incident Type', 'resolution_days': 'Avg Resolution (days)'},
-        title="Resolution Time by Incident Type"
-    )
-    st.plotly_chart(fig, use_container_width=True)
+    
+        # Display in Streamlit
+        st.plotly_chart(fig, use_container_width=True)
+    with col2:
+        #bottleneck
+        # Convert created_at to datetime if not already
+        df['resolved_at'] = pd.to_datetime(df['resolved_at'], errors='coerce')
+        df['created_at'] = pd.to_datetime(df['created_at'])
 
+        # Compute resolution time in days
+        df['resolution_days'] = (df['resolved_at'] - df['created_at']).dt.days
 
+        avg_resolution = df.groupby('incident_type')['resolution_days'].mean().sort_values(ascending=False)
+        #st.subheader("Average Resolution Time by Incident Type (days)")
+        #st.dataframe(avg_resolution)
 
-    #Charts and visualizations
-    st.subheader("Bar Chart showin the Severity per Incident")
-    fig = px.bar(
-        df, 
-        x='incident_type',  # column name in df
-        y='severity', 
-        color='incident_type'  # if you want each incident_type to have different colors
-    )
-    #display bar chart
-    st.plotly_chart(fig, use_container_width=True)
-
+        #display bottleneck with chart
+        fig = px.bar(
+            avg_resolution, 
+            x=avg_resolution.index, 
+            y='resolution_days',
+            labels={'x': 'Incident Type', 'resolution_days': 'Avg Resolution (days)'}
+        )
+        fig.update_layout(
+            title_text='Resolution Time by Incident Type',
+            annotations=[dict(text='Incidents', x=0.5, y=0.5, font_size=20, showarrow=False)]
+        )
+        st.plotly_chart(fig, use_container_width=True)
 
     # Make sure 'date_created' is a datetime column
     df['created_at'] = pd.to_datetime(df['created_at'])
@@ -222,26 +237,38 @@ with tab1:
     # Filter dataframe
     df_filtered = df[df['incident_type'] == incident_choice]
 
-    # Map severity to numeric values
+    # Map severity to numeric values if not already done
     severity_map = {"Low": 1, "Medium": 2, "High": 3, "Critical": 4}
     df_filtered['severity_numeric'] = df_filtered['severity'].map(severity_map)
-
-    
 
     # Sort by date
     df_filtered = df_filtered.sort_values('created_at')
 
-    st.subheader(f"Line Chart of Severity Over Time for {incident_choice}")
+    # Create interactive line chart
+    fig = px.line(
+        df_filtered, 
+        x='created_at', 
+        y='severity_numeric',
+        markers=True,
+        title=f"Severity Over Time for {incident_choice}",
+        labels={
+            'created_at': 'Date Created',
+            'severity_numeric': 'Severity (1=Low, 4=Critical)'
+        },
+        template='plotly_dark'  # or 'plotly_white', 'ggplot2', etc.
+    )
 
-    # Plot
-    fig, ax = plt.subplots()
-    ax.plot(df_filtered['created_at'], df_filtered['severity_numeric'], marker='o', linestyle='-')
-    ax.set_xlabel("Date Created")
-    ax.set_ylabel("Severity (1=Low, 4=Critical)")
-    ax.set_title(f"Severity Over Time for {incident_choice}")
-    ax.grid(True)
-    #display line chart
-    st.pyplot(fig)
+    # Add hover info for better readability
+    fig.update_traces(
+        hovertemplate='<b>Date:</b> %{x}<br><b>Severity:</b> %{y}<br><b>Level:</b> %{customdata}',
+        customdata=df_filtered['severity']
+    )
+
+    # Optional: make line smoother
+    fig.update_traces(line=dict(shape='spline', width=3), marker=dict(size=8))
+
+    # Display in Streamlit
+    st.plotly_chart(fig, use_container_width=True)
 
 with tab2:
     UserService.require_login(role="staff")
