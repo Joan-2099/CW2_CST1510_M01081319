@@ -52,33 +52,26 @@ with tab1:
             username=st.text_input("Enter username")
             password=st.text_input("Enter password")
 
-            col1, col2 = st.columns(2)
-            with col1:
-                login = st.form_submit_button("Login")
-                #logging user in
-                if login:
-                    is_valid, error_msg, role = UserService.login_user(username, password)
-                    if not is_valid:
-                        st.error(f"Error: {error_msg}")
-                    else:
-                        st.success(f"{username} logged insuccessfully!")
-                        st.session_state.logged_in = True
-                        st.session_state.username=username
-                        st.session_state.role=role
-                        #st.switch_page("pages/main_dash.py")
-            with col2:
-                new_acc=st.form_submit_button("Create new acount")
-                st.markdown("If you don't have account")
-                if new_acc:
-                    st.info("Redirect to registration page or open registration form")
-                    st.switch_page("pages/register.py")  
+            
+            login = st.form_submit_button("Login")
+            #logging user in
+            if login:
+                is_valid, error_msg, role = UserService.login_user(username, password)
+                if not is_valid:
+                    st.error(f"Error: {error_msg}")
+                else:
+                    st.success(f"{username} logged insuccessfully!")
+                    st.session_state.logged_in = True
+                    st.session_state.username=username
+                    st.session_state.role=role
+                    st.switch_page("pages/main_dash.py")
     else:
         st.success(f"User '{st.session_state.username}' is logged in as {st.session_state.role}")
         if st.button("Logout"):
             st.session_state.logged_in = False
             st.session_state.username = None
             st.session_state.role = None
-            st.experimental_rerun()
+            st.rerun()
             
 with tab2:
     #Register tab
@@ -107,9 +100,6 @@ with tab2:
                     st.error(msg)
                 else:
                     st.success(f"{username} registered succesfully")
-                    st.markdown("Would you like to login")
                     
-                    login=st.form_submit_button("Login")
-                    if login:
-                        st.switch_page("Home.py")
+                  
             

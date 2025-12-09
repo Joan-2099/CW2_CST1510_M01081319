@@ -1,6 +1,4 @@
 from pathlib import Path
-import bcrypt
-
 # Path to outer DATA folder
 # goes up two levels to CST1520_CS2
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -82,6 +80,7 @@ class TableCreator:
         self.conn.commit()
         print("it_tickets table created successfully.")
 
+   
 
     def create_all_tables(self):
         #Create all tables.

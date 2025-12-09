@@ -254,7 +254,7 @@ with tab1:
     st.plotly_chart(fig, use_container_width=True)
 
 with tab2:
-    UserService.require_login(role="staff")
+    UserService.require_role("staff")
     #Changing incidents status
     st.subheader("Unresoleved incident")
     incidents_df=incidents_manager.get_all_incidents(conn)

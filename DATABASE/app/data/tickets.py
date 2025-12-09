@@ -22,7 +22,7 @@ class Tickets:
                 headers = tickets[0].keys()
             else:  # tuple from DB
                 headers = ["id", "title", "description", "status", "assigned_to",
-                           "date_created", "resolved_date", "created_at"]
+                         "resolved_date", "created_at"]
 
         with open(self.csv_path, "w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
@@ -40,7 +40,7 @@ class Tickets:
         if tickets:
             if isinstance(tickets[0], tuple):
                 headers = ["id", "title", "description", "status", "assigned_to",
-                           "date_created", "resolved_date", "created_at"]
+                            "resolved_date", "created_at"]
             else:
                 headers = tickets[0].keys()
         else:
@@ -52,7 +52,7 @@ class Tickets:
         conn = connect_database()
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO it_tickets (title, description, status, assigned_to, date_created) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO it_tickets (title, description, status, assigned_to, created_at) VALUES (?, ?, ?, ?, ?)",
             (title, description, status, assigned_to, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         )
         conn.commit()
@@ -61,6 +61,7 @@ class Tickets:
 
         self.sync_csv_from_db()
         return ticket_id
+
 
     def get_ticket_by_id(self, ticket_id):
         conn = connect_database()

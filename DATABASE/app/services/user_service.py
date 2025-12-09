@@ -134,17 +134,19 @@ class UserService:
     #function to ensure users remain logged in or locked out if not logged in
     @staticmethod
     def require_login(role=None):
+        # Check if user is logged in at all
         if not st.session_state.get("logged_in", False):
             st.warning("You must be logged in to access this page.")
             st.stop()
 
-        if role is not None and st.session_state.get("role") != role:
-            st.warning(f"This page is restricted to {role}")
+    @staticmethod
+    def require_role(role):
+        # First ensure user is logged in
+        if not st.session_state.get("logged_in", False):
+            st.warning("You must be logged in to access this page.")
             st.stop()
 
-    @staticmethod
-    def logout():
-        """Clear session state and refresh page to enforce login."""
-        ctx = get_script_run_ctx()
-        if ctx is not None:
-            raise RerunException(ctx)
+        # Now check role
+        if st.session_state.get("role") != role:
+            st.warning(f"This page is restricted to {role}.")
+            st.stop()

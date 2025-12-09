@@ -14,7 +14,7 @@ def load_csv_to_table(conn, csv_path, table_name):
             print(f"Warning: CSV file '{csv_path}' is empty.")
             return 0
 
-        expected_columns = ["date", "incident_type", "severity", "status", "description", "reported_by","created_at"]
+        expected_columns = ["title", "description", "status", "assigned_to", "resolved_date", "created_at"]
         df = df[expected_columns]
 
         # Read existing records
@@ -42,10 +42,10 @@ def load_csv_to_table(conn, csv_path, table_name):
 conn = connect_database("DATA/intelligence_platform.db")
 
 # Path to CSV file
-csv_path = "DATA/new_incidents.csv"
+csv_path = "DATA/new_it_tickets.csv"
 
 # Name of the table in database
-table_name = "cyber_incidents"
+table_name = "it_tickets"
 
 # Call the function
 rows_added = load_csv_to_table(conn, csv_path, table_name)

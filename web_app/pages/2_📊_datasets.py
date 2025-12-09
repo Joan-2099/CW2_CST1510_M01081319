@@ -42,19 +42,13 @@ uploaded_file = st.file_uploader(
 default_choice=st.selectbox("Choose existing datasets",["--None--"] + list(default_dataset_files.keys()))
 
 
+# Load dataset
 if uploaded_file is not None:
-    try:
-        # Read CSV into pandas DataFrame
-        df = pd.read_csv(uploaded_file)
-    except Exception as e:
-        # Show error if the CSV cannot be read
-        st.error(f"Error reading CSV file: {e}")
+    try: df = pd.read_csv(uploaded_file)
+    except Exception as e: st.error(f"Error reading CSV file: {e}")
 elif default_choice != "--None--":
-    try:
-        df = pd.read_csv(default_dataset_files[default_choice])
-        st.success(f"Loaded default dataset: {default_choice}")
-    except Exception as e:
-        st.error(f"Error loading default dataset: {e}")
+    try: df = pd.read_csv(default_dataset_files[default_choice]); st.success(f"Loaded default dataset: {default_choice}")
+    except Exception as e: st.error(f"Error loading default dataset: {e}")
 
 
 #user input
@@ -68,36 +62,70 @@ if df is not None:
         record_count = len(df)
 
         if uploaded_file is not None:
-            file_size_mb = uploaded_file.size / (1024 * 1024)
+            file_size_mb = uploaded_file.size / (1024*1024)
         elif default_choice != "--None--":
-            file_size_mb = Path(default_dataset_files[default_choice]).stat().st_size / (1024 * 1024)
+            file_size_mb = Path(default_dataset_files[default_choice]).stat().st_size / (1024*1024)
+
+        record_count = len(df)
+        st.subheader("Dataset Resource Info")
+        st.write(f"📊 Rows detected: **{record_count}** | 💾 File size: **{file_size_mb:.5f} MB**")
+        st.write(f"🗂 Columns: **{len(df.columns)}** | Missing values: **{df.isna().sum().sum()}** | Duplicates: **{df.duplicated().sum()}**")
+
 
         date_created=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         last_updated=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         submit=st.button("Submit Dataset")
 
-        st.write(f"📊 Rows detected: **{record_count}**")
-        st.write(f"💾 File size: **{file_size_mb:.2f} MB**")
+        
 
         if submit:
             datasets_func.insert_dataset(name, description, source, date_created, last_updated, record_count, file_size_mb)
             st.success("Metadata saved")
 
-        #to ensure not to overwrite df
-        metadata_df = datasets_func.get_all_datasets()
-        st.dataframe(metadata_df)
+    #to ensure not to overwrite df
+    st.subheader("Metadata table")
+    metadata_df = datasets_func.get_all_datasets()
+        #st.dataframe(metadata_df)
 
-    #display basic info about the CSV and list
-    st.subheader("CSV Summary")
-    st.write("Number of rows:", len(df))
-    num_columns = len(df.columns)
-    st.write(f"Number of columns: {num_columns}")
+        #metadata_df = datasets_func.get_all_datasets()
 
-    
+    # Convert to DataFrame safely
+    if isinstance(metadata_df, list):
+        metadata_df = pd.DataFrame(metadata_df)  # let pandas assign numeric columns
+
+        # Optionally rename columns if you know their meaning
+    if metadata_df.shape[1] >= 9:  # make sure it has enough columns
+        metadata_df.columns = [
+            "id", "name", "description", "source", "date_created", 
+            "last_updated", "record_count", "file_size_mb", "extra_column"
+        ]
+    st.dataframe(metadata_df)
+
+    # horizontal bar chart safely
+    required_cols = ['source', 'record_count', 'file_size_mb']
+    if all(col in metadata_df.columns for col in required_cols):
+        metadata_summary = metadata_df.groupby('source').agg({
+            'record_count':'sum',
+            'file_size_mb':'sum'
+        }).reset_index()
+
+        fig = px.bar(
+            metadata_summary,
+            y='source', 
+            x=['record_count','file_size_mb'], 
+            orientation='h', 
+            barmode='group', 
+            title='Dataset Summary by Source',
+            labels={'value':'Count / Size', 'source':'Department'}
+        )
+        st.plotly_chart(fig, use_container_width=True, key="Horizontal chart for Departments")
+    else:
+        st.warning(f"Missing expected columns in metadata: {set(required_cols)-set(metadata_df.columns)}")
+
     #ensure chart code is withing the if bock to display if file is uploaded 
     #Display charts
     st.subheader("⚙️ Charts")
-    chart_type=st.radio("Choose a chart type:",["Bar Chart","Pie Chart"])
+    chart_type=st.radio("Choose a chart type:",["Bar Chart","Pie Chart","Donut Chart", "Line Chart"])
 
         #colum selections
     all_columns=df.columns.tolist()
@@ -107,17 +135,29 @@ if df is not None:
     x_axis=st.selectbox("Select X-axis (category):", all_columns)
     y_axis=st.selectbox("Select Y_axis (category):",numeric_cols)
 
-        #display of charts
+        
+    #display of charts
+    
     if chart_type == "Bar Chart":
         st.subheader("Bar Chart")
         fig = px.bar(df, x=x_axis, y=y_axis,color=x_axis)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True, key="Bar Chart for data")
     elif chart_type == "Pie Chart":
         st.subheader("Pie Chart")
         fig = px.pie(df, names=x_axis, values=y_axis,title=f"{y_axis} by {x_axis}")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True, key="Pie Chart for data")
+    elif chart_type == "Donut Chart":
+        st.subheader("Donut Chart")
+        fig = px.pie(df, names=x_axis, values=y_axis, title=f"{y_axis} by {x_axis}", hole=0.4)
+        st.plotly_chart(fig, use_container_width=True, key="Donut Chart for data")
+    elif chart_type == "Line Chart":
+        st.subheader("Line Chart")
+        fig = px.line(df, x=x_axis, y=y_axis, color=x_axis, markers=True)
+        st.plotly_chart(fig, use_container_width=True, key="Line Chart for data")
     else:
         st.info("Ensure to upload a csv file")
+
+
 
     #AI Summary
     st.subheader("🤖 AI Summary of Dataset")
