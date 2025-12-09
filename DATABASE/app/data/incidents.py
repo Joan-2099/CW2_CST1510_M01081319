@@ -1,9 +1,8 @@
 import pandas as pd
 import csv
 from pathlib import Path
-from google import genai
+import datetime
 from DATABASE.app.data.db import connect_database
-import streamlit as st
 
 project_root = Path("/Users/joanmartha/Desktop/CST1510_CS2")
 CSV_FILE = project_root / "DATA" / "cyber_incidents.csv"
@@ -51,8 +50,9 @@ class Incidents:
         rows = cursor.rowcount
         return rows
 
+
     def update_incident(self, incident_id, date=None, incident_type=None,
-                        severity=None, status=None, description=None, reported_by=None):
+                    severity=None, status=None, description=None, reported_by=None):
         cursor = self.conn.cursor()
         field_map = {
             "date": date,
@@ -62,6 +62,11 @@ class Incidents:
             "description": description,
             "reported_by": reported_by,
         }
+
+        # Handle resolved_at automatically
+        if status == "Resolved":
+            field_map["resolved_at"] = datetime.date.today().isoformat()
+
         fields = []
         values = []
         for field, value in field_map.items():
@@ -75,6 +80,7 @@ class Incidents:
             cursor.execute(sql, values)
             self.conn.commit()
 
+            # Optional: update CSV backup
             self._write_to_csv([
                 incident_id, date, incident_type, severity, status, description, reported_by
             ])
