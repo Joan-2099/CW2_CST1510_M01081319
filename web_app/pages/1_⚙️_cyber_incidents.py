@@ -28,32 +28,15 @@ st.title("Cyber Incidents page")
 #initialize session state
 init_session()
 conn = connect_database()
+st.session_state.incidents_manager = Incidents(conn)
+incidents_manager = st.session_state.incidents_manager
 
 df = None
 tab1, tab2 = st.tabs(["Incidents","Incidents manager"])
+
 with tab1:
-    #allow user to upload csv file
-    uploaded_file = st.file_uploader(
-        "Upload CSV file",
-        type=["csv"],  # to onlty allow CSV files
-        help="Select a CSV file to preview and check."
-    )
-
-    if uploaded_file is not None:
-        try:
-            if uploaded_file is not None:
-                # Read CSV into pandas DataFrame
-                df = pd.read_csv(uploaded_file)
-                st.success("CSV uploaded successgully")
-        except Exception as e:
-            # Show error if the CSV cannot be read
-            st.error(f"Error reading CSV file: {e}")
-
-    st.session_state.incidents_manager = Incidents(conn)
-    incidents_manager = st.session_state.incidents_manager
-
     # fetch data
-    df = incidents_manager.get_all_incidents()
+    df = incidents_manager.get_all_incidents(conn)
 
     #Correct mispelt and duplicate incident
     df['incident_type'] = df['incident_type'].str.strip().str.title()
@@ -274,7 +257,7 @@ with tab2:
     UserService.require_login(role="staff")
     #Changing incidents status
     st.subheader("Unresoleved incident")
-    incidents_df=incidents_manager.get_all_incidents()
+    incidents_df=incidents_manager.get_all_incidents(conn)
     # Only unresolved incidents
     unresolved = incidents_df[incidents_df["status"] != "Resolved"]
 
