@@ -39,7 +39,7 @@ class Datasets:
         return dataset_id
 
 
-    def get_all_datasets():
+    def get_all_datasets(self):
         """Fetch all datasets."""
         conn = connect_database()
         cursor = conn.cursor()

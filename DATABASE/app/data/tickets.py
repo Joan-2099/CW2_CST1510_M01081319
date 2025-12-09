@@ -105,20 +105,28 @@ class Tickets:
     def assign_ticket(self, ticket_id, staff_member):
         conn = connect_database()
         cursor = conn.cursor()
-        cursor.execute("UPDATE it_tickets SET assigned_to=? WHERE id=?", (staff_member, ticket_id))
-        conn.commit()
-        conn.close()
-        self.sync_csv_from_db()
+        try:
+            cursor.execute("UPDATE it_tickets SET assigned_to=? WHERE id=?", (staff_member, ticket_id))
+            conn.commit()
+        finally:
+            conn.close()
+            self.sync_csv_from_db()
 
     #Update the status of a ticket
     def update_ticket_status(self, ticket_id, new_status):
         conn = connect_database()
         cursor = conn.cursor()
-        cursor.execute("UPDATE it_tickets SET status=? WHERE id=?", (new_status, ticket_id))
-        cursor.execute("UPDATE it_tickets SET resolved_date = TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-        conn.commit()
-        conn.close()
-        self.sync_csv_from_db()
+        try:
+            if new_status== "Resolved":
+                cursor.execute("UPDATE it_tickets SET status=?, resolved_date = CURRENT_TIMESTAMP Where id=?",(new_status, ticket_id))
+        
+            else:
+                 cursor.execute("UPDATE it_tickets SET status=? WHERE id=?", (new_status, ticket_id))
+        finally:
+            conn.commit()
+            conn.close()
+            self.sync_csv_from_db()
+
 
     #Delete a ticket from the database by its ID.
     def delete_ticket(self, ticket_id):

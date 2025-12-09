@@ -9,3 +9,5 @@ incident_id,date,incident_type,severity,status,description,reported_by
 110,2025-12-03,Masquerading,Medium,Open,False account,Hank
 111,2025-12-04,Phising,High,Open,Multiple false accounts,Haime
 112,2025-12-06,Phishing,High,Open,Suspicious email link,Gerald
+101,2025-12-09,Phising,High,Open,Too many false accounts,Henry
+101,,,,In Progress,,

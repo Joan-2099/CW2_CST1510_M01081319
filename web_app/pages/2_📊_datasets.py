@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import sys
 from pathlib import Path
-from google import genai
 import plotly.express as px
 
 project_root = Path("/Users/joanmartha/Desktop/CST1510_CS2")
@@ -10,9 +9,11 @@ sys.path.append(str(project_root))
 
 from DATABASE.app.services.user_service import UserService
 from DATABASE.app.data.api import API_analyzer
+from DATABASE.app.data.datasets import Datasets
+from datetime import datetime
 
 api_analyze= API_analyzer()
-
+datasets_func = Datasets()
 st.set_page_config(page_title="Data Science",layout="wide")
 
 st.title("Data Science")
@@ -56,20 +57,36 @@ elif default_choice != "--None--":
         st.error(f"Error loading default dataset: {e}")
 
 
+#user input
 if df is not None:
-    st.dataframe(df, width=1200, height=600)
-    
-    # Show a success message and preview the data
-    st.success("CSV successfully uploaded!")
+    st.dataframe(df)
 
-    #Update table
-    with st.expander("Update Table"):
-        reported_by=st.text_input("Name")
-        title = st.text_input("Incident Title")
-        severity = st.selectbox("Severity", ["Low", "Medium", "High", "Critical"])
-        status = st.selectbox("Status", ["Open", "In Progress", "Resolved"])
-        description = st.text_area("Description")
-  
+    with st.expander("Save dataset to Metadata Catalog"):
+        name=st.text_input("Enter name")
+        source=st.selectbox("Choose a department",["Cybersecurity","IT","Human Resource"])
+        description=st.text_area("Description")
+        record_count = len(df)
+
+        if uploaded_file is not None:
+            file_size_mb = uploaded_file.size / (1024 * 1024)
+        elif default_choice != "--None--":
+            file_size_mb = Path(default_dataset_files[default_choice]).stat().st_size / (1024 * 1024)
+
+        date_created=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        last_updated=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        submit=st.button("Submit Dataset")
+
+        st.write(f"📊 Rows detected: **{record_count}**")
+        st.write(f"💾 File size: **{file_size_mb:.2f} MB**")
+
+        if submit:
+            datasets_func.insert_dataset(name, description, source, date_created, last_updated, record_count, file_size_mb)
+            st.success("Metadata saved")
+
+        #to ensure not to overwrite df
+        metadata_df = datasets_func.get_all_datasets()
+        st.dataframe(metadata_df)
+
     #display basic info about the CSV and list
     st.subheader("CSV Summary")
     st.write("Number of rows:", len(df))
@@ -115,7 +132,8 @@ if df is not None:
     sample_csv = df.head(num_rows).to_csv(index=False)
 
     if st.button("Generate AI Summary"):
-        api_analyze.analyze_datasets(df,sample_csv)
+        ai_text=api_analyze.analyze_datasets(df,sample_csv)
+        st.info(ai_text)
         
 else:
     st.info("Please upload a CSV file to preview it.")

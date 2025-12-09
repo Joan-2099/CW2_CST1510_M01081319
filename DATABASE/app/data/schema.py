@@ -55,7 +55,7 @@ class TableCreator:
                 description TEXT,
                 source TEXT,
                 date_created TEXT,
-                    last_updated TEXT,
+                last_updated TEXT,
                 record_count INTEGER,
                 file_size_mb REAL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

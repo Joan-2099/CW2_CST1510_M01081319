@@ -29,6 +29,24 @@ st.title("Cyber Incidents page")
 init_session()
 UserService.require_login(role="user")
 
+df = None
+
+#allow user to upload csv file
+uploaded_file = st.file_uploader(
+    "Upload CSV file",
+    type=["csv"],  # to onlty allow CSV files
+    help="Select a CSV file to preview and check."
+)
+
+if uploaded_file is not None:
+    try:
+        if uploaded_file is not None:
+            # Read CSV into pandas DataFrame
+            df = pd.read_csv(uploaded_file)
+            st.success("CSV uploaded successgully")
+    except Exception as e:
+        # Show error if the CSV cannot be read
+        st.error(f"Error reading CSV file: {e}")
 
 if "incidents_manager" not in st.session_state:
     conn = connect_database()
