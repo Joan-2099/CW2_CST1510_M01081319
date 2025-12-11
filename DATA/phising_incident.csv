@@ -1,0 +1,47 @@
+date,incident_type,severity,status,description,reported_by,created_at
+2025-10-25,Phishing,Critical,Open,Suspicious email asking employees to reset corporate passwords,Olivia,2025-10-25 08:12:05
+2025-10-26,Phishing,Critical,Open,Fraudulent bank emails requesting login credentials sent to multiple users,John,2025-10-26 09:25:32
+2025-10-27,Phishing,Critical,In progress,Spear-phishing attempt targeting finance department,Hannah,2025-10-27 11:04:15
+2025-10-28,Phishing,Critical,Open,Fake invoice emails tricking staff into transferring funds,Alex,2025-10-28 12:45:10
+2025-10-29,Phishing,High,In progress,Employees received suspicious HR emails asking to verify personal info,Liam,2025-10-29 14:17:50
+2025-10-30,Phishing,Critical,Open,Cloned login pages sent to staff prompting credential entry,Mike,2025-10-30 13:22:18
+2025-10-31,Phishing,High,In progress,Emails impersonating executives requesting urgent wire transfers,Olivia,2025-10-31 10:30:05
+2025-11-01,Phishing,Critical,Open,Fake IT alerts requesting password updates sent to multiple users,John,2025-11-01 09:50:12
+2025-11-02,Phishing,Critical,In progress,Malicious attachments disguised as tax documents delivered to staff,Hannah,2025-11-02 11:12:45
+2025-11-03,Phishing,High,Open,Spear-phishing targeting senior management emails,Alex,2025-11-03 14:03:20
+2025-11-04,Phishing,Critical,In progress,Emails claiming to be software update prompts asking for credentials,Liam,2025-11-04 12:22:50
+2025-11-05,Phishing,Critical,Open,Phishing attempt via fake conference invitations,Mike,2025-11-05 15:10:33
+2025-11-06,Phishing,High,In progress,Users received links mimicking corporate login page,Olivia,2025-11-06 10:44:05
+2025-11-07,Phishing,Critical,Open,Multiple reports of emails requesting sensitive HR data,John,2025-11-07 09:15:12
+2025-11-08,Phishing,Critical,In progress,Targeted attacks against finance emails with malicious links,Hannah,2025-11-08 13:25:44
+2025-11-09,Phishing,High,Open,Fake alert emails claiming security breach to steal credentials,Alex,2025-11-09 11:50:30
+2025-11-10,Phishing,Critical,In progress,Phishing emails with attachments mimicking invoice PDFs,Liam,2025-11-10 12:45:15
+2025-11-11,Phishing,High,Open,Emails impersonating IT support asking users to reset passwords,Mike,2025-11-11 14:30:22
+2025-11-12,Phishing,Critical,In progress,Staff received spoofed emails requesting personal information,Olivia,2025-11-12 09:50:10
+2025-11-13,Phishing,Critical,Open,Spear-phishing email mimicking executive instructions,John,2025-11-13 10:12:45
+2025-11-14,Phishing,High,In progress,Multiple users clicked links in fake account update emails,Hannah,2025-11-14 11:30:22
+2025-11-15,Phishing,Critical,Open,Fake security notification emails asking for login details,Alex,2025-11-15 13:15:55
+2025-11-16,Phishing,High,In progress,Malicious emails impersonating HR requesting bank info,Liam,2025-11-16 14:45:12
+2025-11-17,Phishing,Critical,Open,Employees reported receiving fake software patch emails,Mike,2025-11-17 15:30:40
+2025-11-18,Phishing,Critical,In progress,Phishing attempt disguised as internal IT ticket request,Olivia,2025-11-18 09:22:50
+2025-11-19,Phishing,High,Open,Emails pretending to be from corporate helpdesk asking for credentials,John,2025-11-19 10:18:33
+2025-11-20,Malware Attacks,High,In progress,Trojan detected on workstation and quarantined,Hannah,2025-11-20 11:55:12
+2025-11-21,Ransomware,Critical,Open,Files on shared drive encrypted by ransomware,Alex,2025-11-21 12:40:05
+2025-11-22,Data Breach,High,In progress,Unauthorized access to customer database detected,Liam,2025-11-22 13:22:40
+2025-11-23,Insider Threat,Medium,Resolved,Employee accessed confidential files without approval,Mike,2025-11-23 14:05:22
+2025-11-24,Masquerading,Medium,Open,Fake social media profile impersonating staff,Olivia,2025-11-24 09:15:11
+2025-11-25,Malware Attacks,High,In progress,Malware detected spreading through email attachments,John,2025-11-25 10:42:05
+2025-11-26,Ransomware,Critical,Open,Encryption attempt detected on network drives,Hannah,2025-11-26 11:50:40
+2025-11-27,Data Breach,High,In progress,Customer data exposed in internal logs,Alex,2025-11-27 12:33:15
+2025-11-28,Insider Threat,Medium,Resolved,Staff attempted unauthorized access to sensitive folder,Liam,2025-11-28 13:22:50
+2025-11-29,Masquerading,Medium,Open,Fake login attempt detected on company portal,Mike,2025-11-29 14:10:33
+2025-11-30,Malware Attacks,High,In progress,Detected malware isolated from network,Olivia,2025-11-30 09:55:12
+2025-12-01,Ransomware,Critical,Open,Files on server locked with ransom note,John,2025-12-01 10:35:45
+2025-12-02,Data Breach,High,In progress,Sensitive client info exposed in backup storage,Hannah,2025-12-02 11:12:30
+2025-12-03,Insider Threat,Medium,Resolved,Unauthorized attempt to download confidential files,Alex,2025-12-03 12:44:15
+2025-12-04,Malware Attacks,High,In progress,Malware detected and quarantined on endpoints,Liam,2025-12-04 13:33:50
+2025-12-05,Phishing,Critical,Open,Suspicious email impersonating vendor requesting credentials,Mike,2025-12-05 14:20:45
+2025-12-06,Phishing,Critical,In progress,Multiple staff received fake password reset emails,Olivia,2025-12-06 09:10:22
+2025-12-07,Phishing,High,Open,Spear-phishing attempts targeting finance emails,John,2025-12-07 10:55:12
+2025-12-08,Masquerading,Medium,In progress,Fraudulent social media account impersonating CEO,Hannah,2025-12-08 11:50:30
+2025-12-09,Malware Attacks,High,Open,Malware outbreak detected in internal file server,Alex,2025-12-09 12:33:15

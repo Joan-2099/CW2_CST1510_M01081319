@@ -3,6 +3,7 @@ import pandas as pd
 import sys
 from pathlib import Path
 import plotly.express as px
+from streamlit_lottie import st_lottie
 
 project_root = Path("/Users/joanmartha/Desktop/CST1510_CS2")
 sys.path.append(str(project_root))
@@ -11,6 +12,7 @@ from DATABASE.app.services.user_service import UserService
 from DATABASE.app.data.api import API_analyzer
 from DATABASE.app.data.datasets import Datasets
 from datetime import datetime
+from Animations.json_anm import load_lottiefile
 
 api_analyze= API_analyzer()
 datasets_func = Datasets()
@@ -122,12 +124,14 @@ if df is not None:
     else:
         st.warning(f"Missing expected columns in metadata: {set(required_cols)-set(metadata_df.columns)}")
 
+
     #ensure chart code is withing the if bock to display if file is uploaded 
     #Display charts
     st.subheader("⚙️ Charts")
+
     chart_type=st.radio("Choose a chart type:",["Bar Chart","Pie Chart","Donut Chart", "Line Chart"])
 
-        #colum selections
+    #colum selections
     all_columns=df.columns.tolist()
     numeric_cols=df.select_dtypes(include='number').columns.tolist()
 
@@ -157,23 +161,34 @@ if df is not None:
     else:
         st.info("Ensure to upload a csv file")
 
+    col1, col2 = st.columns(2)
 
+    
+    with col1:
+        #AI Summary
+        st.subheader("🤖 AI Summary of Dataset")
 
-    #AI Summary
-    st.subheader("🤖 AI Summary of Dataset")
+        num_rows = st.slider(
+            "How many rows to sample for AI summary?", 
+            #ensure user can't sample less than 5 rows and cant go beyond existing num of rows
+            min_value=5,
+            max_value=len(df),
+            value=min(20, len(df))
+        )
+        sample_csv = df.head(num_rows).to_csv(index=False)
+        AI_summary= st.button("Generate AI Summary")
 
-    num_rows = st.slider(
-        "How many rows to sample for AI summary?", 
-        #ensure user can't sample less than 5 rows and cant go beyond existing num of rows
-        min_value=5,
-        max_value=len(df),
-        value=min(20, len(df))
-    )
-    sample_csv = df.head(num_rows).to_csv(index=False)
-
-    if st.button("Generate AI Summary"):
+        
+    with col2:
+        tools =load_lottiefile("Animations/Tools.json")
+        st_lottie(tools,
+            speed =1,
+            height=250,
+            key=None
+        )
+        
+    if AI_summary:
         ai_text=api_analyze.analyze_datasets(df,sample_csv)
         st.info(ai_text)
-        
 else:
     st.info("Please upload a CSV file to preview it.")

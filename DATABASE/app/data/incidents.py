@@ -49,20 +49,7 @@ class Incidents:
 
         #Returns the database ID of the new incident.
         return incident_id
-    
-    #Fetch all incidents from the database and return them as a pandas DataFrame.
-    def get_all_incidents(self, conn):
-    
-        #Return in order of most recent
-        return pd.read_sql_query("SELECT * FROM cyber_incidents ORDER BY id DESC", conn)
 
-    #Delete an incident by its ID.
-    def delete_incident(self, conn, incident_id):
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM cyber_incidents WHERE id = ?", (incident_id,))
-        conn.commit()
-        #Returns the number of rows deleted (should be 1 if successful).
-        return cursor.rowcount
 
     #Update fields of an existing incident.
     def update_incident(self, conn, incident_id, date=None, incident_type=None,
@@ -102,7 +89,7 @@ class Incidents:
             cursor.execute(sql, values)
             conn.commit()
 
-            # Optional: update CSV backup as well
+            # update CSV backup as well
             self._write_to_csv([
                 incident_id, date, incident_type, severity, status, description, reported_by
             ])
@@ -110,3 +97,17 @@ class Incidents:
 
         # Return None if nothing was updated
         return None
+
+        #Delete an incident by its ID.
+    def delete_incident(self, conn, incident_id):
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM cyber_incidents WHERE id = ?", (incident_id,))
+        conn.commit()
+        #Returns the number of rows deleted (should be 1 if successful).
+        return cursor.rowcount
+    
+    #Fetch all incidents from the database and return them as a pandas DataFrame.
+    def get_all_incidents(self, conn):
+    
+        #Return in order of most recent
+        return pd.read_sql_query("SELECT * FROM cyber_incidents ORDER BY id DESC", conn)

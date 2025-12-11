@@ -112,14 +112,14 @@ class UserService:
         
         #check if fields are empty
         if not username.strip():
-            return False, "Please enter username"
+            return False, "Please enter username",None
         
         if not password.strip() :
-            return False, "Please enter password"
+            return False, "Please enter password",None
         
         #check if username doesnt exist
         if not user_data:
-            return False, "User not found."
+            return False, "User not found.",None
         # Verify password
         stored_hash = user_data[2]  # password_hash column
         role = user_data[3]#this gets role from Database

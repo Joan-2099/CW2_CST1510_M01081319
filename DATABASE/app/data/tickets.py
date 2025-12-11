@@ -13,7 +13,7 @@ class Tickets:
 
     # Insert a new ticket into the database and sync it to the CSV file
     def save_to_csv(self, tickets, headers=None):
-        """Save a list of tickets to CSV."""
+        #Save a list of tickets to CSV.
         if not tickets:
             return
 

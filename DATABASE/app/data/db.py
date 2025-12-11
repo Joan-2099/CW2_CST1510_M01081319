@@ -29,6 +29,38 @@ def init_database():
     conn.close()
     print("Database initialized and tables created.")
 
+def alter_table(db_path: Path,table_name: str,new_col_name: str,new_col_type: str = "TEXT",backfill_func=None):
+    
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row  # to access columns by name
+    cursor = conn.cursor()
+
+    # Add the column if it doesn't exist
+    try:
+        cursor.execute(f"ALTER TABLE {table_name} ADD COLUMN {new_col_name} {new_col_type};")
+        conn.commit()
+        print(f"Column '{new_col_name}' added successfully to {table_name}.")
+    except sqlite3.OperationalError as e:
+        print(f"Operation skipped: {e}")
+
+    # Backfill the column if a function is provided
+    if backfill_func:
+        cursor.execute(f"SELECT * FROM {table_name}")
+        rows = cursor.fetchall()
+        for row in rows:
+            row_dict = dict(row)
+            # Only backfill if column is NULL or empty
+            if not row_dict.get(new_col_name):
+                new_value = backfill_func(row_dict)
+                cursor.execute(
+                    f"UPDATE {table_name} SET {new_col_name} = ? WHERE rowid = ?",
+                    (new_value, row_dict['rowid'])
+                )
+        conn.commit()
+        print(f"Backfilled '{new_col_name}' for {len(rows)} rows in {table_name}.")
+
+    conn.close()
+
 #function to wipe table data
 def wipe_table(table_name):
     conn = connect_database()  
@@ -41,6 +73,6 @@ def wipe_table(table_name):
     finally:
         cursor.close()
         conn.close()
-
+        
 #table_name = "cyber_incidents"
 #wipe_table(table_name)

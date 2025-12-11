@@ -1,6 +1,7 @@
 import sys
 import streamlit as st
 from pathlib import Path
+from streamlit_lottie import st_lottie
 
 # Absolute path to project root
 project_root = Path("/Users/joanmartha/Desktop/CST1510_CS2")
@@ -8,6 +9,7 @@ sys.path.append(str(project_root))
 
 from DATABASE.app.services.user_service import UserService
 from DATABASE.app.data.db import connect_database
+from Animations.json_anm import load_lottiefile
 
 
 # Define the absolute path to the database
@@ -24,15 +26,13 @@ st.title("Welcome to my Dashboard")
 st.set_page_config(
     page_title="Home",
     page_icon="🔑",
-    layout="centered"
+    layout="wide"
 )
 
 #with tab_login:
 st.subheader("Login 🔑")
 login_form = st.form("Login Form")
 
-with st.sidebar:
-    st.markdown("Navigation")
 
 # initialize session state
 if "logged_in" not in st.session_state:
@@ -41,30 +41,45 @@ if "username" not in st.session_state:
     st.session_state.username = ""
 if "role" not in st.session_state:
     st.session_state.role=""
-
+if st.session_state.logged_in:
+    with st.sidebar:
+        st.markdown("Navigation")
+        
 tab1,tab2 =st.tabs(["Login","Register"])
 
 with tab1:
     if not st.session_state.logged_in:
-        with st.form("Login"):
-            #login user input
-            st.subheader("Login form")
-            username=st.text_input("Enter username")
-            password=st.text_input("Enter password")
+        col1,col2 = st.columns(2)
+        with col1:
+            with st.form("Login"):
+                #login user input
+                st.subheader("Login form")
+                username=st.text_input("Enter username")
+                password=st.text_input("Enter password")
 
+                
+                login = st.form_submit_button("Login")
+                #logging user in
+                if login:
+                    is_valid, error_msg,role = UserService.login_user(username, password)
+                    if not is_valid:
+                        st.error(f"Error: {error_msg}")
+                    else:
+                        st.success(f"{username} logged insuccessfully!")
+                        st.session_state.logged_in = True
+                        st.session_state.username=username
+                        st.session_state.role=role
+                        st.switch_page("pages/main_dash.py")
+
+        with col2:
+            lottie_file=load_lottiefile("Animations/Unlock.json")
+            st_lottie(lottie_file,
+                    speed =1,
+                    height=450,
+                    key=None
+            )
+                
             
-            login = st.form_submit_button("Login")
-            #logging user in
-            if login:
-                is_valid, error_msg, role = UserService.login_user(username, password)
-                if not is_valid:
-                    st.error(f"Error: {error_msg}")
-                else:
-                    st.success(f"{username} logged insuccessfully!")
-                    st.session_state.logged_in = True
-                    st.session_state.username=username
-                    st.session_state.role=role
-                    st.switch_page("pages/main_dash.py")
     else:
         st.success(f"User '{st.session_state.username}' is logged in as {st.session_state.role}")
         if st.button("Logout"):
@@ -72,6 +87,8 @@ with tab1:
             st.session_state.username = None
             st.session_state.role = None
             st.rerun()
+
+    
             
 with tab2:
     #Register tab

@@ -37,8 +37,7 @@ class API_analyzer:
             Include patterns, trends, anomalies, and any interesting insights.
             Columns: {column_types}
             """
-
-        
+ 
         with st.spinner("Generating AI summary..."):
             response = self.client.models.generate_content(
                 model=self.model,

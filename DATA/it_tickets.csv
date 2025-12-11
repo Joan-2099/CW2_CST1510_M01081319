@@ -1,7 +1,53 @@
-id,title,description,status,assigned_to,date_created,resolved_date,created_at
+id,title,description,status,assigned_to,resolved_date,created_at
 1,Heating phone,My phone is very hot,Open,,,,2025-11-27 08:20:15
 2,Random shutdown of computer,My laptop keeps shutting down,Resolved,Leona,,,2025-11-27 17:45:04
 3,Apps opening on their own,I downloaded a bunch of movies for free off the internet and since then many apps have been opening on their own,Open,Leona,2025-12-03 14:52:47,,2025-12-03 10:52:47
 4,Laptop can't power on,I spilled some water on my laptop last night and it can't trun on even after charging,Resolved,Leona,2025-12-03 16:22:04,,2025-12-03 12:22:04
 5,Phone constantly  heating,My phone always heats up when charging,Resolved,Melissa,2025-12-03 16:29:04,2025-12-09 06:02:07,2025-12-03 12:29:04
 6,Instagram got hacked,Someone hacked my instagram and has been sending out messages asking for money,In progress,Melissa,2025-12-04 13:52:33,,2025-12-04 09:52:33
+7,Apps freezing,Apps freeze every few minutes,Resolved,Melissa,,2025-11-06 14:21:33,2025-11-03 09:44:15
+8,Battery draining fast,Battery empties in under an hour,Resolved,Baron,,2025-11-14 17:01:14,2025-11-12 09:55:24
+9,Bluetooth not pairing,Phone won’t connect to earbuds,Resolved,Leona,,2025-11-01 09:15:47,2025-10-30 11:22:08
+10,Broken USB port,USB not detected when plugged in,Open,Harvey,,,2025-11-23 09:33:55
+11,Broken charger port,Charger only works at a certain angle,In progress,Joshua,,,2025-11-02 10:18:11
+12,Broken microphone,People can’t hear during calls,Open,Leona,,,2025-11-20 08:15:33
+13,Broken speakers,Speakers crackle when playing audio,Open,Leona,,,2025-11-06 09:40:18
+14,Call dropping,Calls end automatically,Resolved,Leona,,2025-11-28 11:22:41,2025-11-25 14:55:18
+15,Camera blurry,Camera won’t focus,Resolved,Melissa,,2025-12-06 13:41:58,2025-12-04 14:50:37
+16,Choppy audio,Audio cuts out randomly,In progress,Harry,,,2025-11-20 13:55:27
+17,Corrupted files,Files won’t open after saving,Open,Baron,,,2025-11-05 13:18:09
+18,Dark spots on display,Black spots spreading on screen,Open,Joshua,,,2025-11-26 10:45:11
+19,Email login failing,Email logs out immediately,Resolved,Harry,,2025-11-01 13:41:09,2025-10-29 09:19:55
+20,Email not syncing,Emails arrive hours late,In progress,Harry,,,2025-11-14 13:41:28
+21,Fingerprint not working,Fingerprint sensor doesn’t detect finger,Resolved,Harry,,2025-12-01 15:12:08,2025-11-27 09:18:45
+22,Instagram hacked,Hacker messaging friends for money,Resolved,Melissa,,2025-12-09 13:40:16,2025-12-04 13:52:33
+23,Keyboard double typing,Keyboard types letters twice,In Progress,Melissa,,,2025-11-28 11:22:41
+24,Keyboard not responding,Keys stop after a few minutes,Resolved,Harry,,2025-11-03 14:03:11,2025-11-01 08:55:32
+25,Laptop crashing,Frequent blue screen errors,In progress,Leona,,,2025-12-01 13:17:55
+26,Laptop fan very loud,Fan sounds like a jet engine,Resolved,Joshua,,2025-11-19 16:44:13,2025-11-16 09:18:44
+27,Laptop not charging,Battery percentage stuck,Resolved,Baron,,2025-12-02 10:44:11,2025-11-29 09:01:55
+28,Laptop overheating severely,Fans blasting even when idle,Resolved,Leona,,2025-11-05 09:14:19,2025-11-01 14:12:22
+29,Mouse cursor drifting,Cursor moves without touching mouse,Resolved,Melissa,,2025-11-20 15:59:18,2025-11-18 11:45:52
+30,Mouse scroll broken,Scroll wheel won’t scroll,Resolved,Joshua,,2025-11-02 12:33:05,2025-10-30 10:11:33
+31,Overheating while gaming,Laptop gets extremely hot during games,Resolved,Harvey,,2025-11-08 12:44:58,2025-11-05 16:15:14
+32,PC beeping on startup,Startup beeps nonstop,Resolved,Harry,,2025-11-09 18:01:45,2025-11-07 15:22:01
+33,Phone black screen,Phone screen stays black,Open,Harvey,,,2025-10-31 11:55:41
+34,Phone freezing,Phone randomly freezes,Resolved,Baron,,2025-11-25 08:55:49,2025-11-21 09:44:19
+35,Phone reboot loop,Phone restarts over and over,Resolved,Harvey,,2025-11-16 08:14:19,2025-11-13 12:18:51
+36,Phone storage full,Storage full even after deleting files,Resolved,Harvey,,2025-11-22 12:33:57,2025-11-19 10:11:37
+37,Phone vibrating nonstop,Phone vibration stuck on,Resolved,Harvey,,2025-12-03 16:21:44,2025-11-30 10:33:28
+38,Power button stuck,Power button unresponsive,Open,Leona,,,2025-10-28 08:44:12
+39,Random pop-ups,Ads appear without apps open,Resolved,Baron,,2025-10-29 16:33:51,2025-10-27 10:12:44
+40,Ringer not working,Phone doesn’t ring during calls,Resolved,Joshua,,2025-11-07 18:11:54,2025-11-04 12:55:22
+41,Router overheating,Router becomes hot during use,Resolved,Melissa,,2025-11-26 13:55:01,2025-11-24 11:19:44
+42,Screen flickering,Display flickers when lid moves,Open,Baron,,,2025-10-29 13:18:55
+43,Screen ghosting,Shadows remain after scrolling,Resolved,Joshua,,2025-11-24 17:22:30,2025-11-22 14:18:07
+44,Slow boot time,Laptop takes 15 minutes to start,Resolved,Joshua,,2025-12-04 12:44:28,2025-12-02 09:13:22
+45,Slow internet,Internet speeds extremely slow,Resolved,Joshua,,2025-11-10 15:22:21,2025-11-09 08:14:44
+46,Touchscreen not responding,Touch input delayed or unresponsive,Open,Melissa,,,2025-11-10 14:01:37
+47,VPN disconnecting,VPN disconnects every few minutes,Resolved,Leona,,2025-11-18 14:02:45,2025-11-15 10:11:03
+48,Weak WiFi signal,Only connects near router,In progress,Harry,,,2025-11-02 15:22:10
+49,Webcam not detected,Camera not showing in apps,Open,Baron,,,2025-11-17 15:22:41
+50,WiFi disconnecting,WiFi drops constantly,Resolved,Harvey,,2025-10-30 11:22:18,2025-10-28 09:12:44
+51,WiFi not detected,Device doesn’t show networks,Open,Harry,,,2025-12-03 11:45:01
+52,Broken USB port,My usb not being detected when plugged in,Open,Unassigned,,,2025-12-09 19:11:17
