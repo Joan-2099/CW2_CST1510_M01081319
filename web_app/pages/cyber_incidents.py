@@ -9,7 +9,6 @@ from streamlit_lottie import st_lottie
 project_root = Path("/Users/joanmartha/Desktop/CST1510_CS2")
 sys.path.append(str(project_root))
 
-
 from DATABASE.app.data.db import connect_database
 from DATABASE.app.data.incidents import Incidents
 from DATABASE.app.services.user_service import UserService

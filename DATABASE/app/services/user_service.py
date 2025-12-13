@@ -2,8 +2,7 @@ import bcrypt
 from pathlib import Path
 import sqlite3
 import streamlit as st
-from streamlit.runtime.scriptrunner import RerunException
-from streamlit.runtime.scriptrunner import get_script_run_ctx
+
 from DATABASE.app.data.users import Users
 from DATABASE.app.data.schema import TableCreator
 from DATABASE.app.data.db import connect_database
