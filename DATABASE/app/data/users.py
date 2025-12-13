@@ -16,9 +16,9 @@ class Users:
         conn.close()
         return user
 
-    @staticmethod
+    
     #function to get users role from dbs
-    def get_user_by_role(username):
+    def get_user_by_role(self,username):
         conn = connect_database()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM users WHERE role = ?", (username,))
@@ -55,14 +55,14 @@ class Users:
 
         return True, ""
     
-    @staticmethod
+   
     # function to check if username exists
-    def verify_user_name(username):
+    def verify_user_name(self,username):
         if Users.get_user_by_username(username) is None:
             return False, "Username not found"
         return True, " "
-    @staticmethod
-    def existing_username(username):
+    
+    def existing_username(self,username):
         if Users.get_user_by_username(username) is None:
             return True, " "
         return False, "Username already exists"

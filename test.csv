@@ -1,0 +1,11 @@
+date,incident_type,severity,status,description,reported_by,created_at,resolved_at
+2025-12-15,Phishing,High,Open,Emails pretending to be from HR requesting credentials,Olivia,2025-12-15 09:12:10,
+2025-12-15,Phishing,Critical,In Progress,Spear-phishing email targeting payroll department,John,2025-12-15 10:05:22,
+2025-12-16,Phishing,High,Open,Fake invoice emails sent to finance team,Hannah,2025-12-16 11:20:05,
+2025-12-16,Malware Attacks,Medium,Resolved,Detected malware on workstation,Alex,2025-12-16 12:40:15,2025-12-18 10:00:00
+2025-12-17,Phishing,Critical,In Progress,Emails impersonating IT support requesting password change,Liam,2025-12-17 09:35:30,
+2025-12-17,Phishing,High,Open,Multiple staff received fake payroll notifications,Mike,2025-12-17 10:55:12,
+2025-12-18,Ransomware,Critical,Resolved,Shared folder encrypted,Olivia,2025-12-18 11:12:40,2025-12-20 14:22:00
+2025-12-18,Phishing,High,In Progress,HR phishing email asking for confidential data,John,2025-12-18 12:30:50,
+2025-12-19,Phishing,Critical,Open,Spear-phishing targeting senior executives,Hannah,2025-12-19 09:50:12,
+2025-12-19,Phishing,High,Open,Fake IT email requesting multi-factor authentication setup,Alex,2025-12-19 10:40:33,

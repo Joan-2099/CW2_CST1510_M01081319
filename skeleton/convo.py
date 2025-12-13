@@ -1,4 +1,3 @@
-import os
 import streamlit as st
 import time
 from google import genai
@@ -39,7 +38,6 @@ if user_input:
         model="gemini-2.5-flash",
         contents=history
     )
-
 
     bot_message = response.text
 

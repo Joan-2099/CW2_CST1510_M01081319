@@ -85,13 +85,17 @@ class UserService:
             conn.close()
 
     def register_user(self,username, password, role):
-        """Register new user with password hashing."""
+        #Register new user with password hashing.
         valid_username, msg = Users.validate_username(username)
         if not valid_username:
             return False, msg
         valid_pass, msg = Users.validate_password(password)
         if not valid_pass:
             return False, msg
+        #check if username exists
+        valid_pass, msg = users.existing_username(username)
+        if not valid_pass:
+            return False,msg
         
         # Hash password
         password_hash = bcrypt.hashpw(password.encode('utf-8'),
@@ -130,6 +134,21 @@ class UserService:
         else:
             return False, "Incorrect password.", None
 
+    @staticmethod
+    def init_session ():
+        if "username" not in st.session_state:
+            st.session_state["username"] = None
+        if "role" not in st.session_state:
+            st.session_state["role"] = None
+        if "is_logged_in" not in st.session_state:
+            st.session_state["is_logged_in"] = False
+
+    @staticmethod
+    def logout():
+        st.session_state.logged_in = False
+        st.session_state.username = None
+        st.session_state.role = None
+        st.rerun()
   
     #function to ensure users remain logged in or locked out if not logged in
     @staticmethod

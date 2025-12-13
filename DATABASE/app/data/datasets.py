@@ -29,8 +29,8 @@ class Datasets:
             writer.writerow(row_data)
 
 
-    def insert_dataset(self,name, description=None, source=None, date_created=None, last_updated=None, record_count=None, file_size_mb=None):
-        """Insert a new dataset into datasets_metadata table."""
+    def insert_dataset(self,name,description=None, source=None, date_created=None, last_updated=None, record_count=None, file_size_mb=None):
+        #Insert a new dataset into datasets_metadata table.
         conn = connect_database()
         cursor = conn.cursor()
         cursor.execute("""
@@ -50,7 +50,7 @@ class Datasets:
     
 
     def get_dataset_by_id(self,dataset_id):
-        """Fetch a dataset by its ID."""
+        #Fetch a dataset by its ID.
         conn = connect_database()
         cursor = conn.cursor()
         cursor.execute(
@@ -60,7 +60,7 @@ class Datasets:
         return dataset
 
     def get_all_datasets(self):
-        """Fetch all datasets."""
+        #Fetch all datasets.
         conn = connect_database()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM datasets_metadata")

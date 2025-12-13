@@ -1,6 +1,8 @@
 import sys
 from pathlib import Path
 import sqlite3
+import pandas as pd
+import os
 
 project_root = Path("/Users/joanmartha/Desktop/CST1510_CS2")
 sys.path.append(str(project_root))
@@ -73,6 +75,62 @@ def wipe_table(table_name):
     finally:
         cursor.close()
         conn.close()
+
+#load csv files from backend and skips duplicates
+def load_csv_to_db(conn, csv_path, table_name, expected_columns=None):
+    # Check if the CSV file exists
+    if not os.path.isfile(csv_path):
+        print(f"Error: CSV file '{csv_path}' does not exist.")
+        return 0
+
+    try:
+        # Read the CSV into a DataFrame
+        df = pd.read_csv(csv_path)
+
+        # Stop if CSV is empty
+        if df.empty:
+            print(f"Warning: CSV file '{csv_path}' is empty.")
+            return 0
+
+        # Keep only the expected columns if provided
+        if expected_columns:
+            missing_cols = set(expected_columns) - set(df.columns)
+            if missing_cols:
+                print(f"Error: CSV is missing required columns: {missing_cols}")
+                return 0
+            df = df[expected_columns]
+
+        # Fetch existing rows to prevent duplicates
+        df_existing = pd.read_sql(
+            f"SELECT {', '.join(expected_columns)} FROM {table_name}",
+            conn
+        ) if expected_columns else pd.read_sql(f"SELECT * FROM {table_name}", conn)
+
+        # Compare CSV vs DB to identify new rows
+        df_to_insert = pd.merge(
+            df,
+            df_existing,
+            how="outer",
+            indicator=True
+        )
+        df_to_insert = df_to_insert[df_to_insert['_merge'] == 'left_only'].drop(columns='_merge')
+
+        # Exit if nothing new to add
+        if df_to_insert.empty:
+            print("No new rows to insert — all data already exists in the DB.")
+            return 0
+
+        # Insert new rows
+        df_to_insert.to_sql(name=table_name, con=conn, if_exists='append', index=False)
+        row_count = len(df_to_insert)
+        print(f"Successfully loaded {row_count} rows into '{table_name}'.")
+        return row_count
+
+    except Exception as e:
+        print(f"Error loading CSV to DB: {e}")
+        return 0
+
+
         
-#table_name = "cyber_incidents"
+#table_name = "datasets_metadata"
 #wipe_table(table_name)

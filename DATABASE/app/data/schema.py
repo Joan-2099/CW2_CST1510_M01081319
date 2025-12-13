@@ -4,6 +4,8 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = PROJECT_ROOT / "DATA"
 DB_PATH = DATA_DIR / "intelligence_platform.db"
+import pandas as pd
+
 
 class TableCreator:
     def __init__(self,conn):
@@ -52,11 +54,10 @@ class TableCreator:
                 name TEXT NOT NULL,
                 description TEXT,
                 source TEXT,
-                date_created TEXT,
-                last_updated TEXT,
+                date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 record_count INTEGER,
-                file_size_mb REAL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                file_size_mb REAL
             )
         """)
         self.conn.commit()
@@ -80,7 +81,6 @@ class TableCreator:
         self.conn.commit()
         print("it_tickets table created successfully.")
 
-   
 
     def create_all_tables(self):
         #Create all tables.

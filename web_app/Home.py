@@ -41,9 +41,6 @@ if "username" not in st.session_state:
     st.session_state.username = ""
 if "role" not in st.session_state:
     st.session_state.role=""
-if st.session_state.logged_in:
-    with st.sidebar:
-        st.markdown("Navigation")
         
 tab1,tab2 =st.tabs(["Login","Register"])
 
@@ -69,7 +66,7 @@ with tab1:
                         st.session_state.logged_in = True
                         st.session_state.username=username
                         st.session_state.role=role
-                        st.switch_page("pages/main_dash.py")
+                        st.switch_page("pages/main.py")
 
         with col2:
             lottie_file=load_lottiefile("Animations/Unlock.json")
@@ -118,5 +115,3 @@ with tab2:
                 else:
                     st.success(f"{username} registered succesfully")
                     
-                  
-            

@@ -13,9 +13,12 @@ sys.path.append(str(project_root))
 from DATABASE.app.data.db import connect_database
 from DATABASE.app.data.incidents import Incidents
 from DATABASE.app.services.user_service import UserService
-from DATABASE.app.services.session import init_session
 from DATABASE.app.data.api import API_analyzer
+from DATABASE.app.data.schema import TableCreator
+from DATABASE.app.utils.csv_utils import load_to_table
 from datetime import date, timedelta
+from DATABASE.app.utils.csv_schema import TABLE_SCHEMAS
+
 from Animations.json_anm import load_lottiefile
 
 api_analyze= API_analyzer()
@@ -28,7 +31,7 @@ st.set_page_config(
 st.title("Cyber Incidents page")
 
 #initialize session state
-init_session()
+UserService.init_session()
 # Ensure user is logged in
 UserService.require_login()
 conn = connect_database()
@@ -42,13 +45,35 @@ with tab1:
     # fetch data
     df = incidents_manager.get_all_incidents(conn)
 
+    uploaded_file = st.file_uploader(
+    "Upload CSV file",
+    type=["csv"],  # to onlty allow CSV files
+    help="Select a CSV file to preview and check."
+    )
+    
+    if uploaded_file is not None:
+
+        # Load CSV to DB and get number of new rows inserted
+        success, rows_added, message = load_to_table(conn,csv_source=uploaded_file,table_name="cyber_incidents",
+            table_schemas=TABLE_SCHEMAS)
+
+        # Show feedback to user
+        if success:
+            st.success(f"CSV processed successfully! {rows_added} new rows added.")
+        else:
+            st.warning(message)
+
+    # Refresh table after CSV load
+    df = incidents_manager.get_all_incidents(conn)
+    st.dataframe(df)
+
+
     #Correct mispelt and duplicate incident
     df['incident_type'] = df['incident_type'].str.strip().str.title()
 
     df['incident_type'] = df['incident_type'].replace({
         'Phising': 'Phishing',  # merge misspelling
     })
-    st.dataframe(df)
 
     # Build options: "ID — Incident Type (Severity)"
     options = [
@@ -89,22 +114,23 @@ with tab1:
 
 
     #create input form
-    st.subheader("Insert incident")
-    with st.form("New Incident"):
-        reported_by=st.text_input("Name")
-        title = st.text_input("Incident Title")
-        severity = st.selectbox("Severity", ["Low", "Medium", "High", "Critical"])
-        status = st.selectbox("Status", ["Open", "In Progress", "Resolved"])
-        description = st.text_area("Description")
-        
+    with st.expander("Input incident"):
+        st.subheader("Insert incident")
+        with st.form("New Incident"):
+            reported_by=st.text_input("Name")
+            title = st.text_input("Incident Title")
+            severity = st.selectbox("Severity", ["Low", "Medium", "High", "Critical"])
+            status = st.selectbox("Status", ["Open", "In Progress", "Resolved"])
+            description = st.text_area("Description")
+            
 
-        submitted = st.form_submit_button("Add Incident")
+            submitted = st.form_submit_button("Add Incident")
 
-        if submitted and title:
-            today = date.today().isoformat()
-            incidents_manager.insert_incident(today, title, severity, status, description,reported_by)
-            st.success("Incident added successfully!")
-            st.rerun()
+            if submitted and title:
+                today = date.today().isoformat()
+                incidents_manager.insert_incident(today, title, severity, status, description,reported_by)
+                st.success("Incident added successfully!")
+                st.rerun()
     col1, col2 = st.columns(2)
     with col1:
 
@@ -132,25 +158,49 @@ with tab1:
         )
 
     with col2:
-        # Filter for Phishing specifically
-        phishing_df = df[df['incident_type'] == 'Phishing']
+        # Select incident type for KPI
+        incident_kpi_choice = st.selectbox(
+            "Select Incident Type for KPI",
+            df['incident_type'].unique(),
+            index=0  # default to the first incident type
+        )
 
-        # Count unresolved Phishing incidents
-        phishing_unresolved = phishing_df[phishing_df['status'] != 'Resolved'].shape[0]
+        # Filter incidents by chosen type
+        kpi_df = df[df['incident_type'] == incident_kpi_choice]
 
+        # Count new incidents in last 7 days
+        recent_count = kpi_df[kpi_df['created_at'] >= pd.Timestamp.today() - pd.Timedelta(days=7)].shape[0]
+
+        # Display KPI
         st.metric(
-            "Unresolved Phishing Cases", 
-            phishing_unresolved,
-            f"{len(phishing_df)} total Phishing incidents"
-            )
+            f"New {incident_kpi_choice} Incidents (7d)",
+            recent_count,
+            f"{len(kpi_df)} total {incident_kpi_choice} incidents"
+        )
+
+            
+    # Select which incident type to view status breakdown for
+    st.subheader("Incident Status Breakdown")
+    incident_type_choice = st.selectbox(
+        "Select Incident Type for Status Breakdown:",
+        df['incident_type'].unique()
+    )
+
+    # Filter dataframe based on user selection
+    selected_df = df[df['incident_type'] == incident_type_choice]
+
+    # Count status metrics
+    status_counts = selected_df['status'].value_counts()
+    unresolved_count = selected_df[selected_df['status'] != 'Resolved'].shape[0]
+
+    # Create 4 columns for the statuses
+    cols = st.columns(4)
+    cols[0].metric("Open", status_counts.get("Open", 0))
+    cols[1].metric("In Progress", status_counts.get("In Progress", 0))
+    cols[2].metric("Resolved", status_counts.get("Resolved", 0))
+    cols[3].metric("Unresolved", unresolved_count)
 
 
-
-    st.subheader("Phishing Incident Status Breakdown")
-    cols = st.columns(3)
-    status_counts = phishing_df['status'].value_counts()
-    for i, status in enumerate(["Open", "In Progress", "Resolved"]):
-        cols[i].metric(f"{status}", status_counts.get(status, 0))
 
     #numbers of incidents by incident type with donut chart
     col1,col2 = st.columns(2)
@@ -209,6 +259,7 @@ with tab1:
         st.plotly_chart(fig, use_container_width=True)
 
     # For severity line chart
+    
     incident_choice = st.selectbox("Select Incident Type:", df['incident_type'].unique(), key="incident_choice_linechart")
     df_filtered = df[df['incident_type'] == incident_choice].copy()  # important .copy()
     severity_map = {"Low": 1, "Medium": 2, "High": 3, "Critical": 4}

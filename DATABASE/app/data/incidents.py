@@ -111,3 +111,5 @@ class Incidents:
     
         #Return in order of most recent
         return pd.read_sql_query("SELECT * FROM cyber_incidents ORDER BY id DESC", conn)
+    
+    

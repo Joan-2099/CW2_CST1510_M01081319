@@ -46,3 +46,13 @@ date,incident_type,severity,status,description,reported_by,created_at,resolved_a
 2025-12-08,Phishing,Critical,In Progress,Fake software update emails,Hannah,2025-12-08 11:50:30,
 2025-12-09,Phishing,Critical,Open,Employees reported receiving fake software patch emails,Alex,2025-12-09 12:33:15,
 2025-12-09,Masquerading,High,Resolved,Fraudulent social media account impersonating CEO,Liam,2025-12-09 13:22:50,2025-12-12 10:20:00
+2025-12-10,Phishing,Critical,Open,Fake payroll email requesting bank details,Olivia,2025-12-10 09:12:05,
+2025-12-10,Phishing,High,In Progress,HR phishing email asking for login info,John,2025-12-10 10:45:32,
+2025-12-11,Malware Attacks,Medium,Resolved,Malware detected on workstation,Hannah,2025-12-11 11:20:15,2025-12-12 14:05:00
+2025-12-11,Phishing,High,Open,Invoice scam pretending to be from finance team,Alex,2025-12-11 12:33:10,
+2025-12-12,Phishing,Critical,In Progress,Spear-phishing targeting senior management,Liam,2025-12-12 13:50:22,
+2025-12-12,Ransomware,Critical,Resolved,Shared network drive encrypted,Olivia,2025-12-12 14:15:05,2025-12-14 10:40:00
+2025-12-13,Phishing,High,Open,Emails impersonating IT support requesting password resets,John,2025-12-13 09:05:12,
+2025-12-13,Insider Threat,Medium,Resolved,Employee accessed confidential HR files,Hannah,2025-12-13 10:30:18,2025-12-15 11:22:00
+2025-12-14,Phishing,Critical,In Progress,Phishing email claiming security breach alert,Alex,2025-12-14 11:50:30,
+2025-12-14,Phishing,High,Open,Fake software update email sent to all staff,Liam,2025-12-14 12:45:22,

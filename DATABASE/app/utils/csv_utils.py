@@ -1,52 +1,61 @@
-import os
 import pandas as pd
 
-from DATABASE.app.data.db import connect_database
-
-def load_csv_to_table(conn, csv_path, table_name):
-    if not os.path.isfile(csv_path):
-        print(f"Error: CSV file '{csv_path}' does not exist.")
-        return 0
-
+#Load CSV data into a database table while avoiding duplicate records.
+def load_to_table(conn, csv_source, table_name, table_schemas):
     try:
-        df = pd.read_csv(csv_path)
-        if df.empty:
-            print(f"Warning: CSV file '{csv_path}' is empty.")
-            return 0
+        # Ensure the table has a defined schema before proceeding
+        if table_name not in table_schemas:
+            return False, 0, f"No schema defined for table '{table_name}'."
 
-        expected_columns = ["date", "incident_type","severity", "status", "description", "reported_by", "created_at"]
+        expected_columns = table_schemas[table_name]
+
+        # Read CSV into DataFrame
+        df = pd.read_csv(csv_source)
+
+        if df.empty:
+            return False, 0, "Uploaded CSV file is empty."
+
+        # Check for missing required columns
+        missing_cols = set(expected_columns) - set(df.columns)
+        if missing_cols:
+            return False, 0, f"Missing required columns: {', '.join(missing_cols)}"
+
+        # Keep only expected columns
         df = df[expected_columns]
 
-        # Read existing records
+        # Read existing records from DB
         df_existing = pd.read_sql(f"SELECT {', '.join(expected_columns)} FROM {table_name}", conn)
 
-        # Keep only new rows
-        df_to_insert = pd.merge(df, df_existing, on=expected_columns, how='outer', indicator=True)
-        df_to_insert = df_to_insert[df_to_insert['_merge'] == 'left_only'].drop(columns='_merge')
+        # Normalize string columns (strip spaces)
+        for col in expected_columns:
+            if df[col].dtype == object:
+                df[col] = df[col].astype(str).str.strip()
+                df_existing[col] = df_existing[col].astype(str).str.strip()
+
+        # Normalize datetime columns to string
+        for ts_col in ['created_at', 'resolved_at']:
+            if ts_col in expected_columns:
+                df[ts_col] = df[ts_col].astype(str)
+                df_existing[ts_col] = df_existing[ts_col].astype(str)
+
+        # Identify new rows that don't exist in DB
+        df_to_insert = pd.merge(
+            df,
+            df_existing,
+            on=expected_columns,
+            how="outer",
+            indicator=True
+        )
+        df_to_insert = df_to_insert[df_to_insert["_merge"] == "left_only"]
+        df_to_insert.drop(columns="_merge", inplace=True)
 
         if df_to_insert.empty:
-            print("No new incidents to add — all already exist in the DB.")
-            return 0
+            return True, 0, "No new records to insert."
 
-        df_to_insert.to_sql(name=table_name, con=conn, if_exists='append', index=False)
-        row_count = len(df_to_insert)
-        print(f"Successfully loaded {row_count} rows into '{table_name}'.")
-        return row_count
+        # Append new rows
+        df_to_insert.to_sql(name=table_name, con=conn, if_exists="append", index=False)
+
+        return True, len(df_to_insert), "CSV data imported successfully."
 
     except Exception as e:
-        print(f"Error loading CSV to table: {e}")
-        return 0
-
-#have to run file from project root  python -m DATABASE.app.utils.csv_utils
-# Connect to the database
-conn = connect_database("DATA/intelligence_platform.db")
-
-# Path to CSV file
-csv_path = "DATA/cyber_incidents.csv"
-
-# Name of the table in database
-table_name = "cyber_incidents"
-
-# Call the function
-rows_added = load_csv_to_table(conn, csv_path, table_name)
-print(f"Rows added: {rows_added}")
+        return False, 0, f"CSV import failed: {e}"

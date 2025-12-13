@@ -1,0 +1,6 @@
+pandas
+plotly
+streamlit_lottie
+altair
+datetime
+json

@@ -2,7 +2,6 @@ import sys
 from pathlib import Path
 import pandas as pd
 import streamlit as st
-import matplotlib.pyplot as plt
 import altair as alt
 import plotly.express as px
 from streamlit_lottie import st_lottie
@@ -12,7 +11,6 @@ sys.path.append(str(project_root))
 from DATABASE.app.data.tickets import Tickets
 from DATABASE.app.data.db import connect_database
 from DATABASE.app.services.user_service import UserService
-from DATABASE.app.services.session import init_session
 from DATABASE.app.data.api import API_analyzer
 from Animations.json_anm import load_lottiefile
 
@@ -36,7 +34,7 @@ st.title("🛠️IT customer service")
 
 
 # Initialize session state for user
-init_session()
+UserService.init_session()
 # Ensure user is logged in
 UserService.require_login()
 tab1, tab2 = st.tabs(["IT users","IT staff"])
