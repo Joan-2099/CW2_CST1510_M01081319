@@ -1,8 +1,3 @@
-
-Student Name: Joan Martha Acom
-Student ID: M01081319
-Course: CST1510 -Programming and Communication with Python
-
 # Multi-Domain Intelligence Platform
 Student Name: Joan Martha Acom
 Student ID: M01081319
@@ -19,23 +14,45 @@ bcrypt – Secure password hashing
 
 ## File Structure
 /CW2_CST1510_M01081319
+|-/.streamlit/secrets.tonl
+|
+|-/Animations
+|   |-json_anm.py             #function to load functions
 │
 ├─ /DATABASE/app/data
-│   ├─ db.py                 # Database connection and helper functions
+│   ├─ db.py                 # Database connection and 
+│   ├─ incidents.py            # CRUD for incidents 
+│   ├─ datasets.py            # CRUD for datasets metadata 
+│   ├─ tickets.py             # CRUD for tickets
+│   ├─ api.py                # Analyze with Gemini for all domains
+│   ├─ init_db.py            # Initializes database at helper functions
 │   ├─ schema.py             # Table creation scripts
-│   ├─ init_db.py            # Initializes database at startup
-│
+|
+├─ /DATABASE/app/services
+│   ├─ user_service.py             #user services
+|
+├─ /DATABASE/app/utils
+│   ├─ csv_schema.py            #
+|   ├─ csv_utils.py             #holds load to table helper func
+|
+|-docs
+|   |-ReadMe
+|
+|-skeleton/..                #raw functions used later
+|
 ├─ /web_app
 │   ├─ /pages
-│   │   ├─ master.py         # Main dashboard and cyber incidents page
+│   │   ├─ cyber_incidents.py         # Main dashboard and cyber incidents page
 │   │   ├─ datasets.py       # Dataset upload, preview, and visualization
 │   │   ├─ it_tickets.py     # IT ticket management page
+|   |   |-main.py           #Description of domains
+|   |-Home.py               # Login and registration page
 │
 ├─ /DATA
 │   └─ intelligence_platform.db  # SQLite database file
 │
 ├─ users.txt                  # (Week 7) File-based user storage for CLI version
-├─ README.md
+├
 ## What’s Saved in Each File
 db.py – Connects to SQLite, contains utility functions like connect_database(), wipe_table(), alter_table(). Functions are standalone for simplicity.
 schema.py – SQL scripts to create tables: users, cyber_incidents, it_tickets, datasets_metadata.
