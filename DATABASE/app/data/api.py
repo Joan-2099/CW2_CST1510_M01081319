@@ -20,7 +20,7 @@ class API_analyzer:
                    """
         with st.spinner("Generating AI in" \
         "cident analysis..."):
-            # Make sure you replace the model with a valid one
+            # Make sure to replace the model with a valid one
             response = self.client.models.generate_content(
                 model=self.model,
                 contents=f"Severity: {severity}\nDescription: {description}\n System prompt:{system_prompt}"

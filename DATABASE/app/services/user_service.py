@@ -142,12 +142,6 @@ class UserService:
         if "is_logged_in" not in st.session_state:
             st.session_state["is_logged_in"] = False
 
-    @staticmethod
-    def logout():
-        st.session_state.logged_in = False
-        st.session_state.username = None
-        st.session_state.role = None
-        st.rerun()
   
     #function to ensure users remain logged in or locked out if not logged in
     @staticmethod

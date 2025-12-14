@@ -231,3 +231,8 @@ with tab2:
                         st.rerun() 
 
     
+if st.button("Log out"):
+    st.session_state.logged_in = False
+    st.session_state.username = None
+    st.session_state.role = None
+    st.rerun()

@@ -192,3 +192,9 @@ if df is not None:
         st.info(ai_text)
 else:
     st.info("Please upload a CSV file to preview it.")
+
+if st.button("Log out"):
+    st.session_state.logged_in = False
+    st.session_state.username = None
+    st.session_state.role = None
+    st.rerun()
