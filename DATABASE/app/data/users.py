@@ -58,12 +58,12 @@ class Users:
    
     # function to check if username exists
     def verify_user_name(self,username):
-        if Users.get_user_by_username(username) is None:
+        if self.get_user_by_username(username) is None:
             return False, "Username not found"
         return True, " "
     
     def existing_username(self,username):
-        if Users.get_user_by_username(username) is None:
+        if self.get_user_by_username(username) is None:
             return True, " "
         return False, "Username already exists"
     
