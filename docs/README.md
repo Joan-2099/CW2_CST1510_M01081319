@@ -3,66 +3,76 @@ Student Name: Joan Martha Acom
 Student ID: M01081319
 Course: CST1510 – Programming and Communication with Python
 
-## Built With
-Python 3.10+ – Core programming language
-Streamlit – Web interface framework
-SQLite – Relational database for persistent storage
-Pandas – Data manipulation and analysis
-Plotly / Plotly Express – Interactive visualizations (bar, pie, line charts)
-Altair – Lightweight charting for some ticket analytics
-bcrypt – Secure password hashing
+## Project Structure
+### Root Directory
+#### /CW2_CST1510_M01081319
+Main project root containing the Streamlit web application, database logic, utilities, documentation, and assets.
+#### Streamlit Configuration
+/.streamlit/secrets.toml
+Stores sensitive configuration values such as API keys and credentials used by the application. This file is excluded from version control for security reasons.
+#### Animations
+/Animations
+Contains animation-related helper files used to enhance the user interface.
+json_anm.py
+Utility function for loading and handling Lottie JSON animations in the Streamlit app.
+#### Database Core Logic
+/DATABASE/app/data
+Houses all database interaction logic and domain-specific CRUD functionality.
+db.py
+Manages SQLite database connections and helper functions.
+incidents.py
+Implements CRUD operations for cybersecurity incidents.
+datasets.py
+Handles CRUD functionality for dataset metadata storage and retrieval.
+tickets.py
+Manages CRUD operations for IT support tickets.
+api.py
+Provides AI-powered analysis using the Gemini API across all domains.
+init_db.py
+Initializes the database and runs setup helper functions.
+schema.py
+Defines database table schemas and creation scripts.
+#### Services Layer
+/DATABASE/app/services
+Contains service-level logic that coordinates application behavior.
+user_service.py
+Handles user registration, login, authentication, role-based access control, and session validation.
+#### Utility Functions
+/DATABASE/app/utils
+Contains stateless helper functions used across the application.
+csv_schema.py
+Defines schemas or structure used when working with CSV data.
+csv_utils.py
+Provides helper functions for loading CSV files into database tables.
+#### Documentation
+/docs
+Project documentation and supporting materials.
+ReadMe
+Contains project description, usage instructions, and structural overview.
+#### Skeleton Code
+/skeleton
+Contains early or raw function implementations that were later refactored and integrated into the main application.
+#### Streamlit Web Application
+/web_app
+Main Streamlit-based web interface.
+/pages
+Contains individual application pages:
+cyber_incidents.py
+Cybersecurity incidents dashboard and management page.
+datasets.py
+Dataset upload, preview, metadata management, and visualization page.
+it_tickets.py
+IT ticket submission, tracking, and staff management page.
+main.py
+Describes platform domains and serves as a domain overview page.
+Home.py
+Login and registration page, serving as the application entry point.
+#### Data Storage
+/DATA
+Contains application data files.
+intelligence_platform.db
+SQLite database storing users, incidents, tickets, and dataset metadata.
 
-## File Structure
-/CW2_CST1510_M01081319
-|-/.streamlit/secrets.tonl
-|
-|-/Animations
-|   |-json_anm.py             #function to load functions
-│
-├─ /DATABASE/app/data
-│   ├─ db.py                 # Database connection and 
-│   ├─ incidents.py            # CRUD for incidents 
-│   ├─ datasets.py            # CRUD for datasets metadata 
-│   ├─ tickets.py             # CRUD for tickets
-│   ├─ api.py                # Analyze with Gemini for all domains
-│   ├─ init_db.py            # Initializes database at helper functions
-│   ├─ schema.py             # Table creation scripts
-|
-├─ /DATABASE/app/services
-│   ├─ user_service.py             #user services
-|
-├─ /DATABASE/app/utils
-│   ├─ csv_schema.py            #
-|   ├─ csv_utils.py             #holds load to table helper func
-|
-|-docs
-|   |-ReadMe
-|
-|-skeleton/..                #raw functions used later
-|
-├─ /web_app
-│   ├─ /pages
-│   │   ├─ cyber_incidents.py         # Main dashboard and cyber incidents page
-│   │   ├─ datasets.py       # Dataset upload, preview, and visualization
-│   │   ├─ it_tickets.py     # IT ticket management page
-|   |   |-main.py           #Description of domains
-|   |-Home.py               # Login and registration page
-│
-├─ /DATA
-│   └─ intelligence_platform.db  # SQLite database file
-│
-├─ users.txt                  # (Week 7) File-based user storage for CLI version
-├
-## What’s Saved in Each File
-db.py – Connects to SQLite, contains utility functions like connect_database(), wipe_table(), alter_table(). Functions are standalone for simplicity.
-schema.py – SQL scripts to create tables: users, cyber_incidents, it_tickets, datasets_metadata.
-init_db.py – Initializes database and creates tables if they don’t exist.
-master.py – Streamlit dashboard; displays cyber incidents table, KPIs, and trend visualizations. Handles form submissions.
-datasets.py – Upload, preview, and visualize CSV datasets. Supports bar and pie charts with Plotly.
-it_tickets.py – View, assign, and update IT tickets. Generates charts for staff performance and ticket status.
-intelligence_platform.db – Stores all user, incident, ticket, and dataset information.
-users.txt – Initial CLI-based storage for user accounts (Week 7).
-Usage
 ## Login/Register
 Users register with a username and password (hashed with bcrypt).
 Role-based access determines which pages and actions are available.
@@ -88,3 +98,11 @@ Notes
 Streamlit automatically reruns the script on user interactions; session-state management prevents duplicate submissions and inconsistent UI.
 SQLite locks and threading issues are handled with proper connection management.
 Pandas and Plotly visualizations validate data to avoid runtime errors from empty or inconsistent datasets.
+ ## Important instructions
+### Run database-related utility scripts from the project root
+When executing functions such as load_csv_to_table(), ensure they are run from the project root directory using module execution (e.g. python -m DATABASE.app.utils.csv_utils). Running these scripts directly may cause import or path resolution errors due to relative imports and project structure.
+
+### Staff-only actions are role-protected
+Features such as updating incident statuses, assigning IT tickets, or managing unresolved records require a user role of "staff". Ensure the correct role is assigned during registration for testing these features.
+## CSV uploads to the incidents page must follow expected structure
+Uploaded CSV files are assumed to have a consistent schema. Files with missing headers, unexpected column names, or incompatible data types may fail silently or be rejected during ingestion.
