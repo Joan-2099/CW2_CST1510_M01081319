@@ -34,7 +34,7 @@ UserService.init_session()
 # Ensure user is logged in
 UserService.require_login()
 conn = connect_database()
-st.session_state.incidents_manager = Incidents(conn)
+st.session_state.incidents_manager = Incidents()
 incidents_manager = st.session_state.incidents_manager
 
 df = None
@@ -127,7 +127,7 @@ with tab1:
 
             if submitted and title:
                 today = date.today().isoformat()
-                incidents_manager.insert_incident(today, title, severity, status, description,reported_by)
+                incidents_manager.insert_incident(conn,today, title, severity, status, description,reported_by)
                 st.success("Incident added successfully!")
                 st.rerun()
     col1, col2 = st.columns(2)

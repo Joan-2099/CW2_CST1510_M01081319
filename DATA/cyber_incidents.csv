@@ -56,3 +56,4 @@ date,incident_type,severity,status,description,reported_by,created_at,resolved_a
 2025-12-13,Insider Threat,Medium,Resolved,Employee accessed confidential HR files,Hannah,2025-12-13 10:30:18,2025-12-15 11:22:00
 2025-12-14,Phishing,Critical,In Progress,Phishing email claiming security breach alert,Alex,2025-12-14 11:50:30,
 2025-12-14,Phishing,High,Open,Fake software update email sent to all staff,Liam,2025-12-14 12:45:22,
+69,2025-12-14,Phishing,Medium,Open,Multiple false accounts,Joan

@@ -79,7 +79,6 @@ if df is not None:
         submit=st.button("Submit Dataset")
 
         
-
         if submit:
             datasets_func.insert_dataset(name, description, source, date_created, last_updated, record_count, file_size_mb)
             st.success("Metadata saved")
